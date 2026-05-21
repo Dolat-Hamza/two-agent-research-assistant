@@ -1,9 +1,8 @@
 import { Activity, CircleDashed, CircleX } from "lucide-react";
 import { cn } from "@/lib/utils";
+import type { RunStatus } from "@/components/app-state";
 
-type Status = "idle" | "ready" | "streaming" | "error";
-
-export function StatusPill({ status, className }: { status: Status; className?: string }) {
+export function StatusPill({ status, className }: { status: RunStatus; className?: string }) {
   if (status === "ready") {
     return (
       <span

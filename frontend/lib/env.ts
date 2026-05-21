@@ -8,5 +8,3 @@
  */
 export const AGENT_URL: string =
   process.env.NEXT_PUBLIC_AGENT_URL?.trim() || "/api/mock-planner";
-
-export const USE_MOCK = AGENT_URL.endsWith("/mock-planner");

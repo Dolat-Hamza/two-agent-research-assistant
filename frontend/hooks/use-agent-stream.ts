@@ -97,11 +97,14 @@ function parseSseFrame(frame: string): AnyAgentEvent | null {
   // Normalise CRLF (real servers) and CR-only to LF so the split below works.
   const lines = frame.replace(/\r\n?/g, "\n").split("\n");
   let event = "";
-  let data = "";
+  // Per SSE spec, multiple `data:` lines in one frame are joined with `\n`
+  // and only a single leading space (after the colon) is stripped.
+  const dataLines: string[] = [];
   for (const line of lines) {
     if (line.startsWith("event:")) event = line.slice(6).trim();
-    else if (line.startsWith("data:")) data += line.slice(5).trim();
+    else if (line.startsWith("data:")) dataLines.push(line.slice(5).replace(/^ /, ""));
   }
+  const data = dataLines.join("\n");
   if (!event || !data) return null;
   try {
     return { type: event as AnyAgentEvent["type"], data: JSON.parse(data) } as AnyAgentEvent;

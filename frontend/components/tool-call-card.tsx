@@ -59,13 +59,7 @@ export function ToolCallCard({
           {results.map((r) => (
             <div key={r.url} className="px-3 py-2.5 hover:bg-panel/60 transition-colors">
               <div className="text-foreground text-[13px] leading-snug">{r.title}</div>
-              <a
-                href="#"
-                onClick={(e) => e.preventDefault()}
-                className="text-[11px] text-mcp/90 hover:text-mcp underline-offset-2 hover:underline break-all"
-              >
-                {r.url}
-              </a>
+              <span className="text-[11px] text-mcp/90 break-all">{r.url}</span>
               <div className="mt-1 text-[12px] text-muted leading-snug">{r.snippet}</div>
             </div>
           ))}

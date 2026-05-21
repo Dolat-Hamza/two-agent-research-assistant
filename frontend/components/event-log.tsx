@@ -5,10 +5,11 @@ import { EVENT_COLOR } from "@/lib/mock-data";
 import { cn } from "@/lib/utils";
 
 export function EventLog({ events }: { events: AgentEvent[] }) {
+  const lastIndex = events.length - 1;
   return (
     <ol className="space-y-2 px-3 sm:px-4 pb-4" aria-label="Agent event log">
-      {events.map((e) => (
-        <EventRow key={e.id} event={e} last={e.id === events.at(-1)?.id} />
+      {events.map((e, i) => (
+        <EventRow key={e.id} event={e} last={i === lastIndex} />
       ))}
     </ol>
   );

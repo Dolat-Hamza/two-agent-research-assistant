@@ -49,6 +49,12 @@ function fmtTs(): string {
   return `${p(d.getHours())}:${p(d.getMinutes())}:${p(d.getSeconds())}`;
 }
 
+function agentTagFor(active: AgentName): "planner" | "search" | undefined {
+  if (active === "planner") return "planner";
+  if (active === "search") return "search";
+  return undefined;
+}
+
 export function AppStateProvider({ children }: { children: React.ReactNode }) {
   const [status, setStatus] = useState<RunStatus>("ready");
   const [activeAgent, setActiveAgent] = useState<AgentName>("idle");
@@ -68,13 +74,6 @@ export function AppStateProvider({ children }: { children: React.ReactNode }) {
   );
 
   const { send, cancel } = useAgentStream();
-
-  // Translate the agent of an incoming event into a tag for the activity log.
-  const agentTagFor = (active: AgentName): "planner" | "search" | undefined => {
-    if (active === "planner") return "planner";
-    if (active === "search") return "search";
-    return undefined;
-  };
 
   const appendEvent = useCallback((ev: AgentEvent) => {
     setEvents((prev) => [...prev, ev]);

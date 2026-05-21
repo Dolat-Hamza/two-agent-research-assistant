@@ -12,14 +12,6 @@ import type {
   ToolCall,
 } from "@/lib/agui-types";
 
-export const SAMPLE_QUERY = "What are the latest developments in AI agent protocols?";
-
-// Empty-state defaults — these become the initial app state until the user
-// kicks off a real run.
-export const INITIAL_MESSAGES: ChatMessage[] = [];
-export const INITIAL_EVENTS: AgentEvent[] = [];
-export const INITIAL_TOOL_CALLS: ToolCall[] = [];
-
 // Suggested prompts shown in the empty state.
 export const SUGGESTIONS: string[] = [
   "What are the latest developments in AI agent protocols?",
