@@ -15,14 +15,10 @@ export function ConsoleHeader() {
       <div className="mx-auto flex h-12 max-w-[1600px] items-center gap-3 px-4 sm:px-6 lg:px-8">
         {/* Brand */}
         <div className="flex items-center gap-2 min-w-0">
-          <span className="relative inline-flex h-2 w-2 shrink-0">
-            <span className="absolute inset-0 animate-ping rounded-full bg-ok/60" />
-            <span className="relative inline-flex h-2 w-2 rounded-full bg-ok" />
-          </span>
           <span className="flex items-baseline gap-1.5 min-w-0">
             <span className="font-semibold tracking-tight text-foreground">Mobiz</span>
             <span className="hidden sm:inline text-[11px] text-dim truncate">
-              · agent research console
+              · Agent Research Console
             </span>
           </span>
         </div>

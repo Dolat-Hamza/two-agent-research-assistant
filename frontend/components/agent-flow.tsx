@@ -7,23 +7,57 @@ import { cn } from "@/lib/utils";
 type Node = {
   key: "planner" | "search" | "tool";
   label: string;
-  port: string;
+  protocol: string;
   badge: "agent" | "tool";
   Icon: React.ComponentType<{ className?: string }>;
+  // Active state — protocol-matched colors
+  activeRing: string;
+  activeBg: string;
+  activeIcon: string;
 };
 
-const PLANNER: Node = { key: "planner", label: "Planner", port: ":8000", badge: "agent", Icon: User2 };
-const SEARCH: Node = { key: "search", label: "Search", port: ":8002", badge: "agent", Icon: Search };
-const TOOL: Node = { key: "tool", label: "web_search", port: ":8001", badge: "tool", Icon: Wrench };
+const PLANNER: Node = {
+  key: "planner",
+  label: "Planner",
+  protocol: "AG-UI",
+  badge: "agent",
+  Icon: User2,
+  activeRing: "ring-agui/60",
+  activeBg: "bg-agui/5",
+  activeIcon: "text-agui",
+};
 
-function stepLabel(agent: "planner" | "search", toolRunning: boolean) {
-  if (agent === "planner") return "synthesising answer";
-  if (agent === "search" && toolRunning) return "preparing web_search call";
-  return "delegated";
-}
+const SEARCH: Node = {
+  key: "search",
+  label: "Search",
+  protocol: "A2A",
+  badge: "agent",
+  Icon: Search,
+  activeRing: "ring-a2a/60",
+  activeBg: "bg-a2a/5",
+  activeIcon: "text-a2a",
+};
+
+const TOOL: Node = {
+  key: "tool",
+  label: "web_search",
+  protocol: "MCP",
+  badge: "tool",
+  Icon: Wrench,
+  activeRing: "ring-mcp/60",
+  activeBg: "bg-mcp/5",
+  activeIcon: "text-mcp",
+};
+
+// Dot color for the pulse on the active card — matches protocol
+const ACTIVE_DOT: Record<Node["key"], string> = {
+  planner: "bg-agui",
+  search: "bg-a2a",
+  tool: "bg-mcp",
+};
 
 export function AgentFlow() {
-  const { activeAgent, toolCalls, status } = useAppState();
+  const { activeAgent, step, toolCalls, status } = useAppState();
 
   const toolRunning = toolCalls.some((t) => t.status === "running");
   const isStreaming = status === "streaming";
@@ -32,6 +66,14 @@ export function AgentFlow() {
     if (k === "search") return activeAgent === "search";
     return toolRunning;
   };
+
+  // Only show the subline during an active run — no "ready" label at rest.
+  const subline =
+    isStreaming || activeAgent !== "idle"
+      ? activeAgent === "idle"
+        ? "starting…"
+        : `${activeAgent} · ${step || (activeAgent === "planner" ? "thinking…" : "searching…")}`
+      : null;
 
   return (
     <div className="px-3 sm:px-4 pt-4 pb-3">
@@ -43,14 +85,12 @@ export function AgentFlow() {
         <FlowItem node={TOOL} active={isActive("tool")} streaming={isStreaming} />
       </div>
 
-      <div className="mt-3 flex items-center gap-2 text-[11px] text-muted">
-        <span className="inline-flex h-1.5 w-1.5 rounded-full bg-current opacity-60" />
-        <span>
-          {activeAgent === "idle"
-            ? "idle ~"
-            : `${activeAgent} · ${stepLabel(activeAgent, toolRunning)}`}
-        </span>
-      </div>
+      {subline && (
+        <div className="mt-3 flex items-center gap-2 text-[11px] text-muted lowercase">
+          <span className="inline-flex h-1.5 w-1.5 rounded-full bg-agui animate-pulse-soft" />
+          <span className="truncate">{subline}</span>
+        </div>
+      )}
     </div>
   );
 }
@@ -69,15 +109,18 @@ function FlowItem({
     <div
       className={cn(
         "min-w-0 rounded-md ring-1 px-2.5 py-2 transition-all bg-panel-2",
-        active ? "ring-copilot/60 bg-copilot/5" : "ring-line",
+        active ? `${node.activeRing} ${node.activeBg}` : "ring-line",
       )}
     >
       <div className="flex items-center gap-1.5">
-        <Icon className={cn("h-3 w-3", active ? "text-copilot" : "text-muted")} />
+        <Icon className={cn("h-3 w-3", active ? node.activeIcon : "text-muted")} />
         <span className="eyebrow truncate">{node.badge}</span>
         {active && streaming && (
           <span
-            className="ml-auto inline-flex h-1.5 w-1.5 rounded-full bg-copilot animate-pulse-soft"
+            className={cn(
+              "ml-auto inline-flex h-1.5 w-1.5 rounded-full animate-pulse-soft",
+              ACTIVE_DOT[node.key],
+            )}
             aria-label="active"
           />
         )}
@@ -90,7 +133,14 @@ function FlowItem({
       >
         {node.label}
       </div>
-      <div className="text-[10.5px] text-dim font-mono mt-0.5">{node.port}</div>
+      <div
+        className={cn(
+          "text-[10.5px] font-mono mt-0.5",
+          active ? node.activeIcon + "/80" : "text-dim",
+        )}
+      >
+        {node.protocol}
+      </div>
     </div>
   );
 }

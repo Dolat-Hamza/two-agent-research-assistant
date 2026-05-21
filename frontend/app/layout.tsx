@@ -17,7 +17,7 @@ const geistMono = localFont({
 });
 
 export const metadata: Metadata = {
-  title: "Mobiz · agent research console",
+  title: "Mobiz · Agent Research Console",
   description:
     "Two AI agents collaborating in real time over the AI agent protocol stack — MCP · A2A · AG-UI · CopilotKit · Vercel AI SDK.",
 };
@@ -32,7 +32,7 @@ export default function RootLayout({
 }: Readonly<{ children: React.ReactNode }>) {
   return (
     <html lang="en" className="dark" style={{ colorScheme: "dark" }} suppressHydrationWarning>
-      <body className={`${geistSans.variable} ${geistMono.variable} antialiased`}>
+      <body className={`${geistSans.variable} ${geistMono.variable} antialiased`} suppressHydrationWarning>
         <ThemeProvider>{children}</ThemeProvider>
       </body>
     </html>

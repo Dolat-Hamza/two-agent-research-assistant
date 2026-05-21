@@ -1,19 +1,28 @@
 "use client";
 
 import { useEffect, useRef } from "react";
+import { Sparkles, AlertTriangle, RotateCcw } from "lucide-react";
 import { useAppState } from "@/components/app-state";
 import { ChatBubble } from "@/components/chat-bubble";
+import { ThinkingBubble } from "@/components/thinking-bubble";
 import { Composer } from "@/components/composer";
+import { SUGGESTIONS } from "@/lib/mock-data";
 
 export function ChatPanel() {
-  const { messages, threadId, status } = useAppState();
+  const { messages, status, errorMessage, sendMessage, clearThread } = useAppState();
   const scrollRef = useRef<HTMLDivElement>(null);
 
+  // Auto-scroll to bottom on new content / status changes.
   useEffect(() => {
     const el = scrollRef.current;
     if (!el) return;
     el.scrollTo({ top: el.scrollHeight, behavior: "smooth" });
-  }, [messages.length, status]);
+  }, [messages, status]);
+
+  const lastMessage = messages.at(-1);
+  // Show the thinking placeholder once a run starts and before the assistant
+  // bubble appears (i.e. last visible message is still the user's).
+  const showThinking = status === "streaming" && lastMessage?.role === "user";
 
   return (
     <section className="flex h-full min-h-0 flex-col bg-panel ring-1 ring-line rounded-lg overflow-hidden">
@@ -22,15 +31,17 @@ export function ChatPanel() {
         <div className="flex items-center gap-2">
           <span className="eyebrow">Conversation</span>
         </div>
-        <div className="flex items-center gap-1.5 text-[11px] text-dim">
-          <span className="font-mono">thread</span>
-          <span>·</span>
-          <span className="text-ok inline-flex items-center gap-1">
-            <span className="h-1.5 w-1.5 rounded-full bg-ok" />
-            active
-          </span>
-          <span className="hidden sm:inline text-dim/70 ml-1.5">{threadId}</span>
-        </div>
+        {messages.length > 0 && (
+          <button
+            type="button"
+            onClick={clearThread}
+            className="inline-flex items-center gap-1.5 rounded-md px-2 py-1 text-[11px] font-medium text-muted ring-1 ring-line bg-panel-2 transition-colors hover:text-foreground hover:ring-accent/40"
+            title="New conversation"
+          >
+            <RotateCcw className="h-3 w-3" />
+            New chat
+          </button>
+        )}
       </div>
 
       {/* Scrollable conversation */}
@@ -40,12 +51,24 @@ export function ChatPanel() {
         aria-live="polite"
       >
         {messages.length === 0 ? (
-          <EmptyState />
+          <EmptyState onPick={sendMessage} />
         ) : (
           <>
-            {messages.map((m) => <ChatBubble key={m.id} message={m} />)}
-            {status === "streaming" && <StreamingPlaceholder />}
+            {messages.map((m) => (
+              <ChatBubble key={m.id} message={m} />
+            ))}
+            {showThinking && <ThinkingBubble />}
           </>
+        )}
+
+        {errorMessage && status === "error" && (
+          <div className="rounded-md bg-err/10 ring-1 ring-err/30 px-3 py-2 text-[12.5px] text-err animate-fade-up">
+            <div className="flex items-center gap-2">
+              <AlertTriangle className="h-3.5 w-3.5 shrink-0" />
+              <span className="font-medium">Something went wrong</span>
+            </div>
+            <div className="mt-1 text-[12px] text-err/80 break-words">{errorMessage}</div>
+          </div>
         )}
       </div>
 
@@ -55,32 +78,31 @@ export function ChatPanel() {
   );
 }
 
-function StreamingPlaceholder() {
+function EmptyState({ onPick }: { onPick: (text: string) => void }) {
   return (
-    <div className="flex gap-3 animate-fade-up">
-      <div className="mt-0.5 flex h-7 w-7 shrink-0 items-center justify-center rounded-full bg-panel-2 ring-1 ring-line text-[10.5px] font-semibold text-accent">
-        PL
+    <div className="flex h-full flex-col items-center justify-center text-center gap-6 px-6 py-10">
+      <div className="grid h-12 w-12 place-items-center rounded-full bg-panel-2 ring-1 ring-line">
+        <Sparkles className="h-5 w-5 text-accent" />
       </div>
-      <div className="min-w-0 flex-1 space-y-2">
-        <div className="flex items-baseline gap-2 text-[11px]">
-          <span className="text-muted">planner.agent</span>
-          <span className="text-warn">streaming</span>
-        </div>
-        <div className="h-3 w-2/3 rounded bg-panel-2/80 animate-pulse-soft" />
-        <div className="h-3 w-1/2 rounded bg-panel-2/70 animate-pulse-soft" />
+      <div className="space-y-1.5">
+        <div className="text-[15px] font-medium text-foreground">Ask the agents anything</div>
+        <p className="text-[12.5px] text-muted max-w-sm">
+          A <span className="text-foreground">Planner</span> and a{" "}
+          <span className="text-foreground">Search</span> agent will collaborate to answer your
+          question — you&apos;ll see them work live in the activity panel.
+        </p>
       </div>
-    </div>
-  );
-}
-
-function EmptyState() {
-  return (
-    <div className="flex h-full flex-col items-center justify-center text-center px-6 py-12">
-      <div className="text-muted text-[13px] max-w-sm">
-        Two agents — <span className="text-foreground">Planner</span> and{" "}
-        <span className="text-foreground">Search</span> — will collaborate to answer your question.
-        <br />
-        Try: <span className="text-foreground">&quot;What are the latest developments in AI agent protocols?&quot;</span>
+      <div className="flex flex-col gap-2 w-full max-w-md">
+        {SUGGESTIONS.slice(0, 3).map((s) => (
+          <button
+            key={s}
+            type="button"
+            onClick={() => onPick(s)}
+            className="rounded-lg bg-panel-2/70 ring-1 ring-line px-3.5 py-2.5 text-left text-[12.5px] text-muted transition-colors hover:bg-panel-2 hover:text-foreground hover:ring-line"
+          >
+            {s}
+          </button>
+        ))}
       </div>
     </div>
   );

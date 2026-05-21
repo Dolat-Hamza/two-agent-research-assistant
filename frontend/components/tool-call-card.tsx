@@ -3,7 +3,7 @@
 import { useState } from "react";
 import { ChevronDown, Loader2, Wrench, CheckCircle2 } from "lucide-react";
 import { cn } from "@/lib/utils";
-import type { SearchResult } from "@/lib/mock-data";
+import type { SearchResult } from "@/lib/agui-types";
 
 export function ToolCallCard({
   name,

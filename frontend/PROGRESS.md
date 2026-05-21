@@ -8,7 +8,59 @@ This file tracks the frontend slice of the POC. Each task below has concrete sub
 
 ---
 
-## Latest update — 2026-05-21
+## Latest update — 2026-05-21 (evening)
+
+**F2 in flight — AG-UI streaming pipeline wired end-to-end against a mock planner.**
+
+Colleagues shipped the contracts and most of the backend on `main`:
+
+- **I1 ✅** — `contracts/` merged: `agent_card.json`, `planner_request.py`, `state_delta.py`, `tools.py`, `README.md`
+- **B1 ✅** — MCP Tool Server on `:8001` (`backend/mcp_server/main.py`) returning real-looking `web_search` results over MCP/SSE
+- **B2 ✅** — Search Agent on `:8002` (`backend/search_agent/main.py`) with A2A Agent Card + JSON `/tasks` + AG-UI `/tasks/stream`
+- **B3 ⏳** — Planner Agent (`:8000`) not yet committed. We built `app/api/mock-planner/route.ts` as a stand-in that emits the documented event sequence so F2 / F3 are testable today.
+
+**Frontend slice for F2:**
+
+- `lib/agui-types.ts` — TypeScript mirror of `contracts/{planner_request,state_delta,tools}.py`. Discriminated union `AnyAgentEvent` with per-type payloads.
+- `lib/env.ts` — `AGENT_URL` resolved from `NEXT_PUBLIC_AGENT_URL`, default `/api/mock-planner`. Flip the env var to point at the real Planner once B3 lands.
+- `hooks/use-agent-stream.ts` — POSTs the planner request body, parses `event: <type>\ndata: <json>` SSE frames, forwards typed events to a callback. Supports cancellation via `AbortController`.
+- `app/api/mock-planner/route.ts` — Next.js Route Handler that emits the full event sequence from the README (RUN_STARTED → STEP_STARTED → STATE_DELTA(planner thinking…) → STEP_STARTED(A2A) → STATE_DELTA(search preparing) → TOOL_CALL_START → STATE_DELTA(search searching the web…) → TOOL_CALL_END → STATE_DELTA(search complete) → STEP_FINISHED → STATE_DELTA(planner writing answer…) → TEXT_MESSAGE_START → CONTENT × N → END → STATE_DELTA(idle) → RUN_FINISHED).
+- `components/app-state.tsx` — context now exposes `sendMessage(text)` and `cancelRun()`. Consumes the event stream, updates `activeAgent`, `step`, `toolCalls`, `events`, and `messages` in real time. Buffers tool-call data and attaches it to the assistant bubble when `TEXT_MESSAGE_START` fires.
+
+**UX polish (the ask-vs-show parts):**
+
+- Page is now viewport-locked (`h-svh` + `overflow-hidden`) — no body scroll. Each panel owns its own internal scroll.
+- Removed the floating CopilotKit mascot (`copilot-mascot.tsx` deleted).
+- Composer simplified to match Claude / ChatGPT: icon-only ↑ send button, no `↵ send / ⇧↵ newline` hints (those are universal), no paperclip, no char counter. Focus uses a soft ring inside the composer card; the harsh browser outline is suppressed on text fields.
+- New `ThinkingBubble` — shown between the user message and the first assistant token, with the live step ("thinking…", "searching the web…", "writing answer…") and animated dots. Matches the ChatGPT/Claude pattern.
+- Empty conversation now shows a Sparkles icon, a short intro, and three suggested prompts pulled from `SUGGESTIONS`.
+- Activity panel's status line under the agent-flow cards reads `planner · thinking…` / `search · searching the web…` instead of raw backend strings (mapped via `friendlyStep()`).
+- Brand renamed (per inline edit) — header shows `● Mobiz · agent research console`.
+
+**Verification:**
+
+- `npx tsc --noEmit` → clean
+- `npm run dev` → Turbopack ready in 928ms, `GET /` 200
+- `POST /api/mock-planner` returns the expected `event: RUN_STARTED → data: {...}` SSE frames; type-checked deserialization in the hook
+- Submit a question on the page → user bubble appears → thinking bubble shows "thinking…" → swaps to "searching the web…" with the tool-call card lighting up in the activity panel → assistant bubble streams in token-by-token with the search results card attached.
+
+**Stack upgraded to current LTS (carried over from morning update).** README originally said "Next.js 14"; nothing in the project actually depended on 14 so we bumped to the current security-patched versions:
+
+| Was | Now | Why |
+|---|---|---|
+| Next 14.2.35 | **Next 16.2.6** (Turbopack) | Patches 14 CVEs in 14.x (DoS, cache poisoning, SSRF, XSS chain) |
+| React 18 | **React 19** | Default with Next 16 |
+| ESLint 8 | **ESLint 9.17** | Required peer of `eslint-config-next@16` |
+| `@copilotkit/* 1.5.20` | **`@copilotkit/* 1.10.6`** | Latest patch line |
+| `lucide-react 0.468` | **`lucide-react 0.469`** | Tracking latest |
+
+Added `overrides` block in `package.json` forcing `prismjs >= 1.30.0` and `postcss ^8.5.10` so the transitive vulns inside `@copilotkit/react-ui` and `next` get resolved without npm trying to *downgrade* CopilotKit to an ancient pre-1.0 release (which is what `npm audit fix --force` did and broke everything).
+
+**Result:** `npm audit` → **`found 0 vulnerabilities`** · `npm run dev` boots in ~900ms on Turbopack · `GET /` 200 · `tsc --noEmit` passes.
+
+---
+
+## Earlier update — 2026-05-21 (morning)
 
 **F1 ✅ shipped.** Console-style two-panel layout, light/dark toggle, mobile responsive (tabbed) with all README elements stubbed via mock data. Wiring to live AG-UI / Planner endpoint is F2's job.
 
@@ -103,15 +155,15 @@ The chat input on the left actually talks to the Planner Agent. When the user su
 This is the moment the protocol stack becomes real. The chat input talks to the Planner Agent over `POST /agent`, which streams an AG-UI event sequence over SSE. The frontend must consume that stream and render `TEXT_MESSAGE_CONTENT` deltas one at a time — a normal `fetch().json()` would defeat the entire point of the AG-UI protocol. CopilotKit's `<CopilotChat>` does most of this for us if we point it at the right runtime URL; our job is wiring + styling + error paths.
 
 ### Sub-tasks
-- ☐ **F2.1** Add `.env.local` with `NEXT_PUBLIC_PLANNER_AGENT_URL=http://localhost:8000/agent` and a typed `lib/env.ts` accessor that throws if it's missing. *Fits in: keeps the agent URL out of code so docker-compose (Task I2) can swap it.*
-- ☐ **F2.2** Add `lib/agui-types.ts` — TypeScript types for every AG-UI event we consume (`RUN_STARTED`, `STEP_STARTED`, `STATE_DELTA`, `TOOL_CALL_START/END`, `TEXT_MESSAGE_START/CONTENT/END`, `RUN_FINISHED`, `RUN_ERROR`). Once `contracts/` (Task I1) lands, re-export from there instead. *Fits in: gives F3 the same vocabulary F2 uses, no string-typed events floating around.*
-- ☐ **F2.3** Create `app/api/copilotkit/route.ts` — Next.js route handler that proxies CopilotKit runtime traffic to `process.env.PLANNER_AGENT_URL`. *Fits in: keeps the browser pointing at a same-origin URL and avoids CORS friction with the FastAPI backend on a different port.*
-- ☐ **F2.4** Update `<CopilotKit runtimeUrl="/api/copilotkit">` in `app/layout.tsx` to point at the route from F2.3 (replaces the F1 placeholder). *Fits in: this is the single switch that turns the static F1 scaffold into a live agent app.*
-- ☐ **F2.5** Replace the F1.7 placeholder in `ChatPanel.tsx` with `<CopilotChat labels={{ title: "Research Assistant", initial: "Ask a research question…" }} />`. Style message bubbles with Tailwind so they fit the dark theme. *Fits in: this is the user's primary input — everything else is window dressing around it.*
-- ☐ **F2.6** Add a typing cursor that's visible during `TEXT_MESSAGE_CONTENT` and disappears on `TEXT_MESSAGE_END`. Use CopilotKit's built-in cursor if available, otherwise a custom blinking caret. *Fits in: it's the tactile cue that streaming is working — without it users assume the page is frozen.*
-- ☐ **F2.7** Drive the header connection dot (F1.9) from AG-UI lifecycle events: gray on idle, amber on `RUN_STARTED`, green on `RUN_FINISHED`, red on `RUN_ERROR`. *Fits in: gives the activity panel a "is anything happening?" pulse without parsing every event.*
-- ☐ **F2.8** Error path — if the Planner is unreachable or sends `RUN_ERROR`, surface a toast and an inline retry button on the last user message. Don't fail silently. *Fits in: backend will crash a lot during the sprint; we need a graceful UX, not a frozen UI.*
-- ☐ **F2.9** Mock the Planner with a tiny FastAPI/Node script that streams a fixed "Hello world" response token by token, so F2 can be developed before B3 is finished. Commit the mock under `frontend/mock-agent/` for the team. *Fits in: removes a hard sequential dependency on backend — we can validate the SSE pipeline independently.*
+- ✅ **F2.1** `lib/env.ts` reads `NEXT_PUBLIC_AGENT_URL` and falls back to `/api/mock-planner`. Add `frontend/.env.local` with `NEXT_PUBLIC_AGENT_URL=/api/agent` once B3 ships and we add the proxy route.
+- ✅ **F2.2** `lib/agui-types.ts` — typed mirror of `contracts/{planner_request,state_delta,tools}.py` plus a discriminated union `AnyAgentEvent` with per-type payloads. Activity log and chat consume this — no string-typed events anywhere.
+- 🟡 **F2.3** Pending B3 — once the real Planner Agent is reachable on `:8000`, add `app/api/agent/route.ts` as a same-origin proxy so the browser doesn't hit cross-origin SSE. For now `AGENT_URL` points straight at `/api/mock-planner`.
+- ⛔ **F2.4** Deferred. We are NOT using `<CopilotChat>` — our hand-rolled chat panel gives full styling control and consumes AG-UI events directly via `useAgentStream`. The CopilotKit React provider will be added if/when we need `useCopilotAction`-style frontend tool calls.
+- ⛔ **F2.5** Deferred for the same reason as F2.4. Our `ChatPanel` / `ChatBubble` / `Composer` set already does everything `<CopilotChat>` does, themed correctly.
+- ✅ **F2.6** Blinking caret rendered on assistant messages while `streaming === true`, finalized on `TEXT_MESSAGE_END`. Plus a separate `ThinkingBubble` between RUN_STARTED and TEXT_MESSAGE_START with animated dots and the live step label ("thinking…", "searching the web…", "writing answer…").
+- ✅ **F2.7** Header status pill: `ready` (idle), `stream active` (between RUN_STARTED and RUN_FINISHED), `error` on RUN_ERROR. Same source of truth (`status` in app-state) drives the agent-flow card pulses and the composer's send→stop swap.
+- ✅ **F2.8** RUN_ERROR surfaces an inline error card in the chat with the message text. `cancelRun()` (the composer's red Stop button while streaming) aborts the in-flight `fetch` cleanly; the streaming assistant bubble finalizes without blinking.
+- ✅ **F2.9** Mock planner endpoint at `app/api/mock-planner/route.ts` — Next.js Route Handler streams the documented event sequence. F2/F3 are fully testable without the real B3 service.
 
 ### Done when
 Typing a question into the chat and pressing Enter results in tokens appearing character-by-character in the answer bubble, with a visible typing cursor that disappears at the end. Disconnecting the backend surfaces a visible error with a retry.

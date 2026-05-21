@@ -9,23 +9,28 @@ import { cn } from "@/lib/utils";
 
 type Tab = "chat" | "activity";
 
+/**
+ * Flex layout — no calc heights. The parent <main> already sits inside a
+ * viewport-locked shell (h-svh + overflow-hidden), so we just take all the
+ * remaining space with flex-1 and let each panel own its internal scroll.
+ */
 export function PanelsShell() {
   const [tab, setTab] = useState<Tab>("chat");
   const { events, status } = useAppState();
 
   return (
-    <div className="flex h-full min-h-0 flex-col">
+    <>
       {/* Mobile / tablet tab bar — hidden on lg+ where both panels show */}
       <div
         role="tablist"
         aria-label="Workspace panels"
-        className="lg:hidden mb-2 flex items-center gap-1 rounded-md ring-1 ring-line bg-panel-2/70 p-1"
+        className="lg:hidden mb-3 flex items-center gap-1 rounded-md ring-1 ring-line bg-panel-2/70 p-1"
       >
         <TabButton
           isActive={tab === "chat"}
           onClick={() => setTab("chat")}
           icon={<MessageSquare className="h-3.5 w-3.5" />}
-          label="Conversation"
+          label="Chat"
           badge={status === "streaming" ? "·" : undefined}
         />
         <TabButton
@@ -39,7 +44,7 @@ export function PanelsShell() {
 
       <div
         className="
-          grid min-h-0 flex-1 gap-3 sm:gap-4
+          grid flex-1 min-h-0 gap-3 sm:gap-4
           grid-cols-1 lg:grid-cols-[minmax(0,1.35fr)_minmax(0,1fr)]
         "
       >
@@ -50,7 +55,7 @@ export function PanelsShell() {
           <ActivityPanel />
         </div>
       </div>
-    </div>
+    </>
   );
 }
 

@@ -1,6 +1,7 @@
 "use client";
 
-import { EVENT_COLOR, type AgentEvent } from "@/lib/mock-data";
+import type { AgentEvent } from "@/lib/agui-types";
+import { EVENT_COLOR } from "@/lib/mock-data";
 import { cn } from "@/lib/utils";
 
 export function EventLog({ events }: { events: AgentEvent[] }) {
