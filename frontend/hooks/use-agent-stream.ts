@@ -58,7 +58,10 @@ export function useAgentStream() {
           const { value, done } = await reader.read();
           if (done) break;
 
-          buffer += decoder.decode(value, { stream: true });
+          // Normalise CRLF at the point of buffering so frame-boundary
+          // detection works regardless of whether the server sends \n\n or
+          // \r\n\r\n as the separator.
+          buffer += decoder.decode(value, { stream: true }).replace(/\r\n?/g, "\n");
 
           // SSE frames are separated by double-newline.
           let frameEnd: number;
@@ -94,8 +97,8 @@ export function useAgentStream() {
  *   data: {"active_agent":"search","step":"searching…","tool_calls":[…]}
  */
 function parseSseFrame(frame: string): AnyAgentEvent | null {
-  // Normalise CRLF (real servers) and CR-only to LF so the split below works.
-  const lines = frame.replace(/\r\n?/g, "\n").split("\n");
+  // Buffer is pre-normalised to LF, so a plain split is enough.
+  const lines = frame.split("\n");
   let event = "";
   // Per SSE spec, multiple `data:` lines in one frame are joined with `\n`
   // and only a single leading space (after the colon) is stripped.

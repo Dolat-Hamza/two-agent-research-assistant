@@ -18,7 +18,14 @@ export function ThinkingBubble() {
   const agentLabel =
     activeAgent === "search" ? "search" : activeAgent === "planner" ? "planner" : "agent";
 
-  const tone = activeAgent === "search" ? "text-copilot" : "text-accent";
+  // Match the protocol-coded colors used in agent-flow.tsx so the avatar
+  // tint stays consistent as the active agent swaps.
+  const tone =
+    activeAgent === "search"
+      ? "text-a2a"
+      : activeAgent === "planner"
+        ? "text-agui"
+        : "text-accent";
 
   return (
     <div className="flex gap-3 animate-fade-up">

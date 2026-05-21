@@ -4,7 +4,6 @@ import {
   createContext,
   useCallback,
   useContext,
-  useId,
   useMemo,
   useRef,
   useState,
@@ -63,9 +62,11 @@ export function AppStateProvider({ children }: { children: React.ReactNode }) {
   const [events, setEvents] = useState<AgentEvent[]>([]);
   const [messages, setMessages] = useState<ChatMessage[]>([]);
   const [errorMessage, setErrorMessage] = useState<string | undefined>();
-  // useId() is deterministic across SSR and hydration — Math.random() is not.
-  const reactId = useId();
-  const threadId = useMemo(() => `thr_${reactId.replace(/:/g, "")}`, [reactId]);
+  // Lives in state so clearThread can rotate it — without that, "New chat"
+  // resets the UI but the planner still resumes the prior conversation.
+  // threadId is never rendered, only sent in the request body, so a
+  // server/client mismatch from Math.random doesn't cause a hydration error.
+  const [threadId, setThreadId] = useState<string>(() => newId("thr"));
   const assistantMsgIdRef = useRef<string | null>(null);
   // Tool calls land before the assistant message exists, so buffer them and
   // attach to the assistant bubble when TEXT_MESSAGE_START fires.
@@ -250,11 +251,13 @@ export function AppStateProvider({ children }: { children: React.ReactNode }) {
       if (!text.trim() || status === "streaming") return;
 
       // Reset transient state for a clean run, then append the user message.
+      // Note: events are NOT cleared here — they accumulate across turns in
+      // the same thread so the activity log shows the whole conversation's
+      // history. Use "New chat" / clearThread to wipe.
       setErrorMessage(undefined);
       setStatus("streaming");
       setActiveAgent("idle");
       setStep("starting…");
-      setEvents([]); // new run = fresh activity log (matches the README intent)
       setToolCalls([]);
       assistantMsgIdRef.current = null;
       pendingToolRef.current = null;
@@ -264,6 +267,10 @@ export function AppStateProvider({ children }: { children: React.ReactNode }) {
       setMessages(nextMessages);
 
       // Build the planner request body from the full conversation.
+      // TODO(B3-integration): assistant turns carry a `tool` field with the
+      // search results that produced them. Once the real Planner Agent lands,
+      // decide with backend whether tool context should be folded into prior
+      // assistant `content`, sent as a separate field, or re-fetched server-side.
       const planner: PlannerMessage[] = nextMessages.map((m) => ({
         role: m.role,
         content: m.content,
@@ -318,6 +325,9 @@ export function AppStateProvider({ children }: { children: React.ReactNode }) {
     setStep("idle");
     setStatus("ready");
     setErrorMessage(undefined);
+    // Rotate threadId so the planner treats the next message as a fresh
+    // conversation rather than resuming the old context.
+    setThreadId(newId("thr"));
     assistantMsgIdRef.current = null;
   }, [cancel]);
 
