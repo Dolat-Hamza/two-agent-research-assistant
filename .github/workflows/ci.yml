@@ -41,17 +41,32 @@ jobs:
       - name: Ruff lint
         if: steps.backend-check.outputs.exists == 'true'
         working-directory: backend
-        run: ruff check .
+        run: |
+          if find . -name "*.py" | grep -q .; then
+            ruff check .
+          else
+            echo "No Python files — skipping ruff lint."
+          fi
 
       - name: Ruff format check
         if: steps.backend-check.outputs.exists == 'true'
         working-directory: backend
-        run: ruff format --check .
+        run: |
+          if find . -name "*.py" | grep -q .; then
+            ruff format --check .
+          else
+            echo "No Python files — skipping ruff format check."
+          fi
 
       - name: Type check
         if: steps.backend-check.outputs.exists == 'true'
         working-directory: backend
-        run: mypy . --ignore-missing-imports --explicit-package-bases
+        run: |
+          if find . -name "*.py" | grep -q .; then
+            mypy . --ignore-missing-imports --explicit-package-bases
+          else
+            echo "No Python files — skipping mypy."
+          fi
 
   test:
     name: Tests
@@ -87,7 +102,12 @@ jobs:
       - name: Run tests
         if: steps.backend-check.outputs.exists == 'true'
         working-directory: backend
-        run: pytest --tb=short -q || echo "No tests found — passing"
+        run: |
+          if find . -name "*.py" | grep -q .; then
+            pytest --tb=short -q || echo "No tests found — passing"
+          else
+            echo "No Python files — skipping pytest."
+          fi
 
   requirements-check:
     name: Requirements Pinned
@@ -99,7 +119,11 @@ jobs:
       - name: Check requirements.txt not empty
         run: |
           if [ ! -d backend ]; then
-            echo "No backend directory — skipping requirements check."
+            echo "No backend directory — skipping."
+            exit 0
+          fi
+          if ! find backend -name "*.py" | grep -q .; then
+            echo "No Python files in backend — skipping requirements check."
             exit 0
           fi
           if [ ! -s backend/requirements.txt ]; then
