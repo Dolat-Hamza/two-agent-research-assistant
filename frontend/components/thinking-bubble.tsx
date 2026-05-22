@@ -2,6 +2,7 @@
 
 import { useAppState } from "@/components/app-state";
 import { cn } from "@/lib/utils";
+import { AgentName } from "@/lib/agui-types";
 
 /**
  * Pre-message "thinking" placeholder, in the spirit of Claude / ChatGPT.
@@ -16,15 +17,19 @@ export function ThinkingBubble() {
   const { activeAgent, step } = useAppState();
 
   const agentLabel =
-    activeAgent === "search" ? "search" : activeAgent === "planner" ? "planner" : "agent";
+    activeAgent === AgentName.Search
+      ? "search"
+      : activeAgent === AgentName.Planner
+        ? "planner"
+        : "agent";
 
   // Tint the agent name with the same protocol color used in the chat bubble
   // and the activity flow — the only visual cue for which agent is active
   // now that the circular avatar is gone.
   const nameTone =
-    activeAgent === "search"
+    activeAgent === AgentName.Search
       ? "text-a2a"
-      : activeAgent === "planner"
+      : activeAgent === AgentName.Planner
         ? "text-agui"
         : "text-accent";
 

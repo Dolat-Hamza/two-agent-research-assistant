@@ -1,5 +1,5 @@
 import { cn } from "@/lib/utils";
-import type { ChatMessage } from "@/lib/agui-types";
+import { AgentName, type ChatMessage } from "@/lib/agui-types";
 import { ToolCallCard } from "@/components/tool-call-card";
 import ReactMarkdown from "react-markdown";
 
@@ -17,7 +17,7 @@ export function ChatBubble({ message }: { message: ChatMessage }) {
   // Carry the protocol color forward through the agent name itself now that
   // the circular avatar is gone — keeps the chat and activity panel speaking
   // the same visual language without a DP-style affordance.
-  const nameTone = message.agent === "search" ? "text-a2a" : "text-agui";
+  const nameTone = message.agent === AgentName.Search ? "text-a2a" : "text-agui";
 
   return (
     <div className="animate-fade-up min-w-0 space-y-2">
