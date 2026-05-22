@@ -8,1088 +8,636 @@
   :root {
     --bg: #0a0c10;
     --surface: #111318;
-    --border: #1e2330;
+    --border: #1d2535;
     --accent: #3b82f6;
-    --accent2: #8b5cf6;
-    --accent3: #10b981;
-    --warn: #f59e0b;
-    --danger: #ef4444;
-    --text: #e2e8f0;
-    --muted: #64748b;
-    --pass: #10b981;
-    --partial: #f59e0b;
+    --text: #dde4f0;
+    --muted: #5a6a85;
+    --pass: #22c55e;
+    --partial: #eab308;
     --fail: #ef4444;
-    --mono: 'JetBrains Mono', 'Fira Code', 'Cascadia Code', monospace;
-    --sans: 'Inter', system-ui, sans-serif;
+    --fixed: #60a5fa;
+    --mono: 'JetBrains Mono', 'Fira Code', monospace;
   }
 
-  * { box-sizing: border-box; margin: 0; padding: 0; }
+  *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+  html { scroll-behavior: smooth; }
 
   body {
     background: var(--bg);
     color: var(--text);
-    font-family: var(--sans);
+    font-family: system-ui, -apple-system, sans-serif;
     font-size: 14px;
-    line-height: 1.6;
-    min-height: 100vh;
+    line-height: 1.65;
+    display: flex;
   }
 
-  /* ── Layout ── */
-  .shell {
-    display: grid;
-    grid-template-columns: 260px 1fr;
-    min-height: 100vh;
-  }
-
-  /* ── Sidebar ── */
+  /* ─── Sidebar ─── */
   aside {
+    width: 230px;
+    flex-shrink: 0;
     background: var(--surface);
     border-right: 1px solid var(--border);
-    padding: 32px 0;
+    height: 100vh;
     position: sticky;
     top: 0;
-    height: 100vh;
     overflow-y: auto;
+    padding: 28px 0 40px;
   }
 
   .logo {
-    padding: 0 24px 24px;
+    padding: 0 20px 22px;
     border-bottom: 1px solid var(--border);
-    margin-bottom: 20px;
+    margin-bottom: 18px;
   }
-
-  .logo-label {
-    font-size: 10px;
-    letter-spacing: 0.12em;
-    text-transform: uppercase;
-    color: var(--muted);
-    margin-bottom: 6px;
-  }
-
-  .logo-title {
-    font-size: 13px;
-    font-weight: 600;
-    color: var(--text);
-    line-height: 1.4;
-  }
-
-  .verdict-badge {
+  .logo-sup { font-size: 10px; letter-spacing: .1em; text-transform: uppercase; color: var(--muted); margin-bottom: 5px; }
+  .logo-name { font-size: 13px; font-weight: 700; color: var(--text); line-height: 1.3; }
+  .verdict-chip {
     display: inline-block;
-    margin-top: 10px;
-    padding: 3px 10px;
-    border-radius: 4px;
+    margin-top: 9px;
+    padding: 2px 9px;
+    border-radius: 3px;
     font-size: 10px;
     font-weight: 700;
-    letter-spacing: 0.08em;
+    letter-spacing: .07em;
     text-transform: uppercase;
-    background: rgba(239,68,68,0.15);
+    background: rgba(239,68,68,.12);
     color: #fca5a5;
-    border: 1px solid rgba(239,68,68,0.3);
+    border: 1px solid rgba(239,68,68,.25);
   }
 
-  nav { padding: 0 12px; }
+  .nav-group { padding: 12px 20px 4px; font-size: 10px; letter-spacing: .1em; text-transform: uppercase; color: var(--muted); font-weight: 600; }
 
   nav a {
-    display: flex;
-    align-items: center;
-    gap: 8px;
-    padding: 7px 12px;
-    border-radius: 6px;
+    display: flex; align-items: center; gap: 8px;
+    padding: 6px 20px;
+    font-size: 12.5px;
     color: var(--muted);
     text-decoration: none;
-    font-size: 12.5px;
-    transition: all 0.15s;
-    margin-bottom: 2px;
+    transition: color .15s, background .15s;
   }
+  nav a:hover { color: var(--text); background: rgba(255,255,255,.04); }
+  nav a .dot { width: 6px; height: 6px; border-radius: 50%; flex-shrink: 0; }
+  .d-pass { background: var(--pass); }
+  .d-partial { background: var(--partial); }
+  .d-fail { background: var(--fail); }
+  .d-info { background: var(--accent); }
 
-  nav a:hover { background: rgba(255,255,255,0.05); color: var(--text); }
-  nav a.active { background: rgba(59,130,246,0.12); color: var(--accent); }
-
-  .nav-dot {
-    width: 7px; height: 7px;
-    border-radius: 50%;
-    flex-shrink: 0;
-  }
-
-  .dot-pass { background: var(--pass); }
-  .dot-partial { background: var(--partial); }
-  .dot-fail { background: var(--fail); }
-  .dot-info { background: var(--accent); }
-
-  .nav-section {
-    font-size: 10px;
-    letter-spacing: 0.1em;
-    text-transform: uppercase;
-    color: var(--muted);
-    padding: 14px 24px 6px;
-    font-weight: 600;
-  }
-
-  /* ── Main ── */
+  /* ─── Main ─── */
   main {
-    padding: 48px 56px;
-    max-width: 960px;
+    flex: 1;
+    min-width: 0;
+    padding: 48px 52px 80px;
+    max-width: 900px;
   }
 
-  /* ── Page header ── */
-  .page-header {
-    margin-bottom: 48px;
-    padding-bottom: 32px;
-    border-bottom: 1px solid var(--border);
-  }
+  /* ─── Page header ─── */
+  .ph { margin-bottom: 44px; padding-bottom: 28px; border-bottom: 1px solid var(--border); }
+  .ph h1 { font-size: 26px; font-weight: 800; letter-spacing: -.02em; }
+  .ph-meta { display: flex; flex-wrap: wrap; gap: 6px 20px; margin-top: 10px; font-size: 12px; color: var(--muted); }
 
-  .page-header h1 {
-    font-size: 28px;
-    font-weight: 700;
-    letter-spacing: -0.02em;
-    color: var(--text);
-    margin-bottom: 8px;
-  }
+  /* ─── Section ─── */
+  .sec { margin-bottom: 52px; scroll-margin-top: 20px; }
+  .sec-hd { display: flex; align-items: center; gap: 10px; margin-bottom: 18px; }
+  .sec-hd h2 { font-size: 17px; font-weight: 700; letter-spacing: -.01em; }
 
-  .header-meta {
-    display: flex;
-    gap: 20px;
-    color: var(--muted);
-    font-size: 13px;
-    margin-top: 12px;
-    flex-wrap: wrap;
-  }
+  .sub-hd { font-size: 13px; font-weight: 600; margin: 22px 0 10px; color: var(--text); }
 
-  .header-meta span { display: flex; align-items: center; gap: 6px; }
-
-  /* ── Sections ── */
-  .section {
-    margin-bottom: 56px;
-    scroll-margin-top: 24px;
-  }
-
-  .section-header {
-    display: flex;
-    align-items: center;
-    gap: 12px;
-    margin-bottom: 20px;
-  }
-
-  .section-header h2 {
-    font-size: 18px;
-    font-weight: 700;
-    letter-spacing: -0.01em;
-    color: var(--text);
-  }
-
-  .status-badge {
-    padding: 3px 10px;
-    border-radius: 4px;
-    font-size: 11px;
-    font-weight: 700;
-    letter-spacing: 0.06em;
-    text-transform: uppercase;
+  /* ─── Badges ─── */
+  .badge {
+    padding: 2px 9px; border-radius: 3px;
+    font-size: 10px; font-weight: 700; letter-spacing: .06em; text-transform: uppercase;
     flex-shrink: 0;
   }
+  .b-pass   { background: rgba(34,197,94,.1);   color: #86efac; border: 1px solid rgba(34,197,94,.2); }
+  .b-partial { background: rgba(234,179,8,.1);  color: #fde047; border: 1px solid rgba(234,179,8,.2); }
+  .b-fail   { background: rgba(239,68,68,.1);   color: #fca5a5; border: 1px solid rgba(239,68,68,.2); }
+  .b-fixed  { background: rgba(96,165,250,.1);  color: #93c5fd; border: 1px solid rgba(96,165,250,.2); }
 
-  .badge-pass { background: rgba(16,185,129,0.12); color: #6ee7b7; border: 1px solid rgba(16,185,129,0.25); }
-  .badge-partial { background: rgba(245,158,11,0.12); color: #fcd34d; border: 1px solid rgba(245,158,11,0.25); }
-  .badge-fail { background: rgba(239,68,68,0.12); color: #fca5a5; border: 1px solid rgba(239,68,68,0.25); }
-  .badge-fixed { background: rgba(59,130,246,0.12); color: #93c5fd; border: 1px solid rgba(59,130,246,0.25); }
+  /* ─── Summary cards ─── */
+  .cards { display: grid; grid-template-columns: repeat(auto-fit, minmax(180px, 1fr)); gap: 14px; margin-bottom: 24px; }
+  .card { background: var(--surface); border: 1px solid var(--border); border-radius: 8px; padding: 18px; }
+  .card-label { font-size: 10px; letter-spacing: .1em; text-transform: uppercase; color: var(--muted); margin-bottom: 8px; font-weight: 600; }
+  .card-val { font-size: 20px; font-weight: 800; color: var(--text); }
+  .card-sub { font-size: 11px; color: var(--muted); margin-top: 3px; }
 
-  .sub-section { margin-bottom: 28px; }
-
-  .sub-section h3 {
-    font-size: 14px;
-    font-weight: 600;
-    color: var(--text);
-    margin-bottom: 12px;
-    display: flex;
-    align-items: center;
-    gap: 8px;
+  /* ─── Exec bullets ─── */
+  .bullets { display: flex; flex-direction: column; gap: 8px; }
+  .bullet {
+    display: flex; align-items: flex-start; gap: 10px;
+    background: var(--surface); border: 1px solid var(--border);
+    border-radius: 7px; padding: 12px 14px;
   }
-
-  /* ── Summary cards ── */
-  .summary-grid {
-    display: grid;
-    grid-template-columns: repeat(3, 1fr);
-    gap: 16px;
-    margin-bottom: 28px;
-  }
-
-  .summary-card {
-    background: var(--surface);
-    border: 1px solid var(--border);
-    border-radius: 10px;
-    padding: 20px;
-  }
-
-  .summary-card .sc-label {
-    font-size: 11px;
-    font-weight: 600;
-    letter-spacing: 0.08em;
-    text-transform: uppercase;
-    color: var(--muted);
-    margin-bottom: 8px;
-  }
-
-  .summary-card .sc-value {
-    font-size: 22px;
+  .bullet-icon {
+    width: 18px; height: 18px; border-radius: 50%;
+    display: flex; align-items: center; justify-content: center;
+    font-size: 10px; flex-shrink: 0; margin-top: 2px;
     font-weight: 700;
-    color: var(--text);
   }
+  .bi-good  { background: rgba(34,197,94,.18);  color: var(--pass); }
+  .bi-bad   { background: rgba(239,68,68,.18);  color: var(--fail); }
+  .bi-warn  { background: rgba(234,179,8,.18);  color: var(--partial); }
+  .bullet-text { font-size: 13px; color: var(--text); line-height: 1.55; min-width: 0; }
 
-  .summary-card .sc-sub {
-    font-size: 12px;
-    color: var(--muted);
-    margin-top: 4px;
-  }
-
-  /* ── Tables ── */
-  .table-wrap {
-    overflow-x: auto;
-    border-radius: 8px;
-    border: 1px solid var(--border);
-    margin-bottom: 20px;
-  }
-
-  table {
-    width: 100%;
-    border-collapse: collapse;
-    font-size: 13px;
-  }
-
-  thead tr {
-    background: rgba(255,255,255,0.03);
-    border-bottom: 1px solid var(--border);
-  }
-
-  th {
-    text-align: left;
-    padding: 10px 14px;
-    font-size: 11px;
-    font-weight: 600;
-    letter-spacing: 0.06em;
-    text-transform: uppercase;
-    color: var(--muted);
-    white-space: nowrap;
-  }
-
-  td {
-    padding: 10px 14px;
-    border-bottom: 1px solid rgba(255,255,255,0.04);
-    color: var(--text);
-    vertical-align: top;
-  }
-
+  /* ─── Tables ─── */
+  .tbl-wrap { border: 1px solid var(--border); border-radius: 7px; overflow: hidden; margin-bottom: 18px; overflow-x: auto; }
+  table { width: 100%; border-collapse: collapse; font-size: 12.5px; }
+  thead tr { background: rgba(255,255,255,.03); border-bottom: 1px solid var(--border); }
+  th { padding: 9px 13px; text-align: left; font-size: 10px; font-weight: 700; letter-spacing: .07em; text-transform: uppercase; color: var(--muted); white-space: nowrap; }
+  td { padding: 9px 13px; border-bottom: 1px solid rgba(255,255,255,.04); vertical-align: top; }
   tr:last-child td { border-bottom: none; }
-  tr:hover td { background: rgba(255,255,255,0.02); }
+  tr:hover td { background: rgba(255,255,255,.02); }
 
-  .cell-pass { color: var(--pass); font-weight: 600; }
-  .cell-fail { color: var(--fail); font-weight: 600; }
-  .cell-partial { color: var(--partial); font-weight: 600; }
-  .cell-fixed { color: #93c5fd; font-weight: 600; }
-  .cell-mono { font-family: var(--mono); font-size: 12px; color: #a78bfa; }
-  .cell-muted { color: var(--muted); }
+  .c-pass    { color: var(--pass);    font-weight: 600; }
+  .c-fail    { color: var(--fail);    font-weight: 600; }
+  .c-partial { color: var(--partial); font-weight: 600; }
+  .c-fixed   { color: var(--fixed);   font-weight: 600; }
+  .c-muted   { color: var(--muted); }
+  .c-mono    { font-family: var(--mono); font-size: 11px; color: #a78bfa; }
 
-  /* ── Bug cards ── */
-  .bug-list { display: flex; flex-direction: column; gap: 10px; }
-
-  .bug-card {
-    background: var(--surface);
-    border: 1px solid var(--border);
-    border-radius: 8px;
-    padding: 14px 16px;
-    display: grid;
-    grid-template-columns: auto 1fr auto;
-    gap: 12px;
-    align-items: start;
-  }
-
-  .bug-card.fixed { border-left: 3px solid var(--accent); }
-  .bug-card.open { border-left: 3px solid var(--danger); }
-  .bug-card.warn { border-left: 3px solid var(--warn); }
-
-  .bug-num {
-    font-family: var(--mono);
-    font-size: 12px;
-    font-weight: 700;
-    color: var(--muted);
-    padding-top: 2px;
-  }
-
-  .bug-body { }
-
-  .bug-title {
-    font-size: 13px;
-    font-weight: 600;
-    color: var(--text);
-    margin-bottom: 4px;
-  }
-
-  .bug-detail {
-    font-size: 12px;
-    color: var(--muted);
-    line-height: 1.5;
-  }
-
-  .bug-loc {
-    font-family: var(--mono);
-    font-size: 11px;
-    color: #7c3aed;
-    background: rgba(124,58,237,0.08);
-    border: 1px solid rgba(124,58,237,0.15);
-    padding: 2px 8px;
-    border-radius: 4px;
-    white-space: nowrap;
-    align-self: start;
-  }
-
-  /* ── Callout boxes ── */
-  .callout {
-    border-radius: 8px;
-    padding: 16px 18px;
-    margin-bottom: 18px;
-    font-size: 13px;
-    line-height: 1.6;
-    border: 1px solid;
-  }
-
-  .callout-info { background: rgba(59,130,246,0.06); border-color: rgba(59,130,246,0.2); color: #93c5fd; }
-  .callout-warn { background: rgba(245,158,11,0.06); border-color: rgba(245,158,11,0.2); color: #fcd34d; }
-  .callout-danger { background: rgba(239,68,68,0.06); border-color: rgba(239,68,68,0.2); color: #fca5a5; }
-  .callout-success { background: rgba(16,185,129,0.06); border-color: rgba(16,185,129,0.2); color: #6ee7b7; }
-
+  /* ─── Callouts ─── */
+  .callout { border-radius: 7px; padding: 13px 15px; margin-bottom: 14px; font-size: 13px; line-height: 1.55; border: 1px solid; }
+  .co-success { background: rgba(34,197,94,.06);  border-color: rgba(34,197,94,.2);  color: #86efac; }
+  .co-warn    { background: rgba(234,179,8,.06);  border-color: rgba(234,179,8,.2);  color: #fde047; }
+  .co-danger  { background: rgba(239,68,68,.06);  border-color: rgba(239,68,68,.2);  color: #fca5a5; }
+  .co-info    { background: rgba(59,130,246,.06); border-color: rgba(59,130,246,.2); color: #93c5fd; }
   .callout strong { font-weight: 700; }
 
-  /* ── Exec summary bullets ── */
-  .exec-bullets { display: flex; flex-direction: column; gap: 8px; margin-top: 16px; }
-
-  .exec-bullet {
-    display: flex;
-    gap: 12px;
-    align-items: flex-start;
-    background: var(--surface);
-    border: 1px solid var(--border);
-    border-radius: 8px;
-    padding: 12px 14px;
-    font-size: 13px;
-    color: var(--text);
-    line-height: 1.5;
+  /* ─── Bug cards ─── */
+  .bugs { display: flex; flex-direction: column; gap: 9px; }
+  .bug {
+    background: var(--surface); border: 1px solid var(--border);
+    border-radius: 7px; padding: 13px 14px;
+    display: grid; grid-template-columns: 28px 1fr auto;
+    gap: 10px; align-items: start;
+  }
+  .bug.fixed  { border-left: 3px solid var(--fixed); }
+  .bug.open   { border-left: 3px solid var(--fail); }
+  .bug.minor  { border-left: 3px solid var(--partial); }
+  .bug-num { font-family: var(--mono); font-size: 11px; font-weight: 700; color: var(--muted); padding-top: 1px; }
+  .bug-title { font-size: 13px; font-weight: 600; color: var(--text); margin-bottom: 3px; }
+  .bug-detail { font-size: 12px; color: var(--muted); line-height: 1.5; }
+  .bug-loc {
+    font-family: var(--mono); font-size: 10px;
+    color: #a78bfa; background: rgba(167,139,250,.08);
+    border: 1px solid rgba(167,139,250,.15);
+    padding: 2px 7px; border-radius: 3px; white-space: nowrap; align-self: start;
   }
 
-  .exec-bullet .eb-icon {
-    width: 20px;
-    height: 20px;
-    border-radius: 50%;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    font-size: 11px;
-    flex-shrink: 0;
-    margin-top: 1px;
-  }
-
-  .eb-good { background: rgba(16,185,129,0.2); color: var(--pass); }
-  .eb-bad { background: rgba(239,68,68,0.2); color: var(--fail); }
-  .eb-warn { background: rgba(245,158,11,0.2); color: var(--warn); }
-
-  /* ── Top 5 table ── */
-  .priority-grid { display: flex; flex-direction: column; gap: 10px; }
-
-  .priority-item {
-    background: var(--surface);
-    border: 1px solid var(--border);
-    border-radius: 8px;
-    padding: 14px 16px;
-    display: grid;
-    grid-template-columns: 28px 1fr 80px;
-    gap: 12px;
-    align-items: start;
-  }
-
-  .pri-num {
-    width: 28px; height: 28px;
-    border-radius: 50%;
-    background: rgba(59,130,246,0.15);
-    color: var(--accent);
-    font-size: 12px;
-    font-weight: 700;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    flex-shrink: 0;
-  }
-
-  .pri-body {}
-  .pri-title { font-size: 13px; font-weight: 600; color: var(--text); margin-bottom: 3px; }
-  .pri-desc { font-size: 12px; color: var(--muted); }
-
-  .pri-impact {
-    font-size: 11px;
-    font-weight: 600;
-    text-align: right;
-    color: var(--accent);
-  }
-
-  /* ── Fixed tag ── */
   .tag {
-    display: inline-flex;
-    align-items: center;
-    gap: 4px;
-    padding: 2px 7px;
-    border-radius: 4px;
-    font-size: 10px;
-    font-weight: 700;
-    letter-spacing: 0.06em;
-    text-transform: uppercase;
+    display: inline-flex; align-items: center;
+    padding: 2px 7px; border-radius: 3px;
+    font-size: 10px; font-weight: 700; letter-spacing: .05em; text-transform: uppercase;
+    white-space: nowrap;
   }
+  .t-fixed { background: rgba(96,165,250,.1);  color: #93c5fd; border: 1px solid rgba(96,165,250,.2); }
+  .t-open  { background: rgba(239,68,68,.1);   color: #fca5a5; border: 1px solid rgba(239,68,68,.2); }
 
-  .tag-fixed { background: rgba(59,130,246,0.12); color: #93c5fd; border: 1px solid rgba(59,130,246,0.25); }
-  .tag-open { background: rgba(239,68,68,0.1); color: #fca5a5; border: 1px solid rgba(239,68,68,0.2); }
-  .tag-warn { background: rgba(245,158,11,0.1); color: #fcd34d; border: 1px solid rgba(245,158,11,0.2); }
-
-  /* ── Footer ── */
-  footer {
-    margin-top: 64px;
-    padding-top: 24px;
-    border-top: 1px solid var(--border);
-    color: var(--muted);
-    font-size: 12px;
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
+  /* ─── Priority list ─── */
+  .plist { display: flex; flex-direction: column; gap: 9px; }
+  .pitem {
+    background: var(--surface); border: 1px solid var(--border);
+    border-radius: 7px; padding: 13px 14px;
+    display: grid; grid-template-columns: 30px 1fr;
+    gap: 12px; align-items: start;
   }
+  .pnum {
+    width: 26px; height: 26px; border-radius: 50%;
+    background: rgba(59,130,246,.15); color: var(--accent);
+    font-size: 12px; font-weight: 700;
+    display: flex; align-items: center; justify-content: center;
+  }
+  .ptitle { font-size: 13px; font-weight: 600; color: var(--text); margin-bottom: 2px; }
+  .pdesc  { font-size: 12px; color: var(--muted); }
 
-  p { margin-bottom: 12px; color: var(--muted); font-size: 13px; line-height: 1.6; }
+  /* ─── Footer ─── */
+  footer { margin-top: 60px; padding-top: 20px; border-top: 1px solid var(--border); font-size: 11px; color: var(--muted); display: flex; justify-content: space-between; }
+
+  /* ─── Inline elements ─── */
   code {
-    font-family: var(--mono);
-    font-size: 11px;
-    background: rgba(255,255,255,0.06);
-    padding: 2px 6px;
-    border-radius: 4px;
+    font-family: var(--mono); font-size: 11px;
+    background: rgba(255,255,255,.07); padding: 1px 5px; border-radius: 3px;
     color: #c4b5fd;
   }
+  p { font-size: 13px; color: var(--muted); line-height: 1.6; margin-bottom: 12px; }
 </style>
 </head>
 <body>
 
-<div class="shell">
-
-<!-- ── Sidebar ── -->
+<!-- ─── Sidebar ─── -->
 <aside>
   <div class="logo">
-    <div class="logo-label">Audit Report</div>
-    <div class="logo-title">Two-Agent Research Assistant</div>
-    <div class="verdict-badge">Prototype-Only</div>
+    <div class="logo-sup">Audit Report</div>
+    <div class="logo-name">Two-Agent Research<br>Assistant</div>
+    <div class="verdict-chip">Prototype-Only</div>
   </div>
 
   <nav>
-    <div class="nav-section">Overview</div>
-    <a href="#exec-summary"><span class="nav-dot dot-info"></span>Executive Summary</a>
-    <a href="#fixes"><span class="nav-dot dot-partial"></span>Fixes Applied</a>
+    <div class="nav-group">Overview</div>
+    <a href="#exec"><span class="dot d-info"></span>Executive Summary</a>
+    <a href="#fixes"><span class="dot d-fixed" style="background:var(--fixed)"></span>Fixes Applied</a>
 
-    <div class="nav-section">Protocol Audit</div>
-    <a href="#agui"><span class="nav-dot dot-partial"></span>AG-UI Compliance</a>
-    <a href="#a2a"><span class="nav-dot dot-fail"></span>A2A Compliance</a>
-    <a href="#mcp"><span class="nav-dot dot-partial"></span>MCP Compliance</a>
+    <div class="nav-group">Protocol Audit</div>
+    <a href="#agui"><span class="dot d-partial"></span>AG-UI Compliance</a>
+    <a href="#a2a"><span class="dot d-fail"></span>A2A Compliance</a>
+    <a href="#mcp"><span class="dot d-partial"></span>MCP Compliance</a>
 
-    <div class="nav-section">Project</div>
-    <a href="#milestones"><span class="nav-dot dot-partial"></span>Milestone Completion</a>
-    <a href="#sdk-compat"><span class="nav-dot dot-partial"></span>SDK Compatibility</a>
-    <a href="#blockers"><span class="nav-dot dot-fail"></span>Critical Bugs</a>
-    <a href="#minor"><span class="nav-dot dot-warn"></span>Non-Critical Issues</a>
-    <a href="#verdict"><span class="nav-dot dot-info"></span>Verdict &amp; Roadmap</a>
+    <div class="nav-group">Project</div>
+    <a href="#milestones"><span class="dot d-partial"></span>Milestones</a>
+    <a href="#sdk"><span class="dot d-partial"></span>SDK Compatibility</a>
+    <a href="#blockers"><span class="dot d-fail"></span>Critical Bugs</a>
+    <a href="#minor"><span class="dot" style="background:var(--partial)"></span>Non-Critical</a>
+    <a href="#verdict"><span class="dot d-info"></span>Verdict &amp; Roadmap</a>
   </nav>
 </aside>
 
-<!-- ── Main ── -->
+<!-- ─── Main ─── -->
 <main>
 
-  <div class="page-header">
+  <div class="ph">
     <h1>Protocol Compliance Audit</h1>
-    <div class="header-meta">
-      <span>📅 2026-05-22</span>
-      <span>🔍 AG-UI · A2A · MCP · CopilotKit · Vercel AI SDK</span>
-      <span>🔀 main @ 63e1ce8</span>
+    <div class="ph-meta">
+      <span>2026-05-22</span>
+      <span>AG-UI · A2A · MCP · CopilotKit · Vercel AI SDK</span>
+      <span>main @ 63e1ce8</span>
     </div>
   </div>
 
-  <!-- ── Executive Summary ── -->
-  <div class="section" id="exec-summary">
-    <div class="section-header">
-      <h2>Executive Summary</h2>
+  <!-- Executive Summary -->
+  <div class="sec" id="exec">
+    <div class="sec-hd"><h2>Executive Summary</h2></div>
+
+    <div class="cards">
+      <div class="card">
+        <div class="card-label">Overall Verdict</div>
+        <div class="card-val" style="color:#fca5a5">Prototype</div>
+        <div class="card-sub">Not production-ready</div>
+      </div>
+      <div class="card">
+        <div class="card-label">Critical Bugs</div>
+        <div class="card-val">10</div>
+        <div class="card-sub">7 fixed in this pass</div>
+      </div>
+      <div class="card">
+        <div class="card-label">Protocol Fidelity</div>
+        <div class="card-val" style="color:#fde047">Low</div>
+        <div class="card-sub">AG-UI partial · A2A fail · MCP partial</div>
+      </div>
     </div>
 
-    <div class="summary-grid">
-      <div class="summary-card">
-        <div class="sc-label">Overall Verdict</div>
-        <div class="sc-value" style="color:#fca5a5">Prototype</div>
-        <div class="sc-sub">Not production-ready</div>
+    <div class="bullets">
+      <div class="bullet">
+        <div class="bullet-icon bi-bad">✕</div>
+        <div class="bullet-text">AG-UI events had wrong field names vs the installed <code>ag-ui-protocol</code> SDK — <code>tool_name</code> instead of <code>tool_call_name</code>, <code>content</code> instead of <code>delta</code>, missing <code>thread_id</code> on run events, <code>STATE_DELTA</code> carrying a snapshot object instead of RFC 6902 JSON Patch. All fixed.</div>
       </div>
-      <div class="summary-card">
-        <div class="sc-label">Critical Bugs</div>
-        <div class="sc-value">10</div>
-        <div class="sc-sub">7 fixed in this pass</div>
+      <div class="bullet">
+        <div class="bullet-icon bi-bad">✕</div>
+        <div class="bullet-text"><code>ag-ui-protocol&gt;=0.1.18</code> was in <code>requirements.txt</code> but never imported — events were emitted as raw format strings, bypassing all SDK validation entirely.</div>
       </div>
-      <div class="summary-card">
-        <div class="sc-label">Protocol Fidelity</div>
-        <div class="sc-value" style="color:#fcd34d">Low</div>
-        <div class="sc-sub">AG-UI: partial · A2A: fail · MCP: partial</div>
+      <div class="bullet">
+        <div class="bullet-icon bi-bad">✕</div>
+        <div class="bullet-text">A2A protocol is non-conformant: plain REST with bespoke shapes instead of JSON-RPC 2.0 with <code>message.parts[]</code> envelope. <code>capabilities.streaming: false</code> was wrong (streaming endpoint exists). Agent card served at wrong path without canonical alias.</div>
       </div>
-    </div>
-
-    <div class="exec-bullets">
-      <div class="exec-bullet">
-        <div class="eb-icon eb-bad">✕</div>
-        AG-UI events had wrong field names vs the installed <code>ag-ui-protocol</code> SDK — <code>tool_name</code> instead of <code>tool_call_name</code>, <code>content</code> instead of <code>delta</code>, missing <code>thread_id</code> on run events, <code>STATE_DELTA</code> carrying a snapshot object instead of RFC 6902 JSON Patch. All fixed.
+      <div class="bullet">
+        <div class="bullet-icon bi-warn">!</div>
+        <div class="bullet-text">MCP server uses the deprecated SSE transport (<code>transport="sse"</code>) — deprecated in MCP 1.7+. Should switch to Streamable HTTP. A new <code>Client</code> instance is created per request, re-establishing SSE connection each time.</div>
       </div>
-      <div class="exec-bullet">
-        <div class="eb-icon eb-bad">✕</div>
-        <code>ag-ui-protocol&gt;=0.1.18</code> was in <code>requirements.txt</code> but never imported — events were emitted as raw format strings, bypassing all SDK validation entirely.
+      <div class="bullet">
+        <div class="bullet-icon bi-good">✓</div>
+        <div class="bullet-text">The frontend pipeline — SSE client, state machine, sticky scroll, dark theme, same-origin proxy, Docker Compose with healthchecks — is well-engineered for a prototype. Issues are exclusively protocol fidelity, not UI quality.</div>
       </div>
-      <div class="exec-bullet">
-        <div class="eb-icon eb-bad">✕</div>
-        A2A protocol is non-conformant: plain REST with bespoke shapes instead of JSON-RPC 2.0 with <code>message.parts[]</code> envelope. <code>capabilities.streaming: false</code> was wrong (streaming endpoint exists). Agent card served at wrong path without canonical alias.
-      </div>
-      <div class="exec-bullet">
-        <div class="eb-icon eb-warn">!</div>
-        MCP server uses the deprecated SSE transport (<code>transport="sse"</code>) — deprecated in MCP 1.7+. Should switch to Streamable HTTP. A new <code>Client</code> instance is created per request, re-establishing SSE connection each time.
-      </div>
-      <div class="exec-bullet">
-        <div class="eb-icon eb-good">✓</div>
-        The frontend pipeline — SSE client, state machine, sticky scroll, dark theme, same-origin proxy, Docker Compose with healthchecks — is well-engineered for a prototype. Issues are exclusively protocol fidelity, not UI quality.
-      </div>
-      <div class="exec-bullet">
-        <div class="eb-icon eb-good">✓</div>
-        All four Docker services build and start cleanly with correct healthcheck chaining. End-to-end demo works and confirms the full protocol stack is wired together.
+      <div class="bullet">
+        <div class="bullet-icon bi-good">✓</div>
+        <div class="bullet-text">All four Docker services build and start cleanly with correct healthcheck chaining. End-to-end demo works and confirms the full protocol stack is wired together.</div>
       </div>
     </div>
   </div>
 
-  <!-- ── Fixes Applied ── -->
-  <div class="section" id="fixes">
-    <div class="section-header">
+  <!-- Fixes Applied -->
+  <div class="sec" id="fixes">
+    <div class="sec-hd">
       <h2>Fixes Applied in This Pass</h2>
-      <span class="status-badge badge-fixed">7 of 10 blockers</span>
+      <span class="badge b-fixed">7 of 10 blockers</span>
     </div>
 
-    <div class="callout callout-success">
-      <strong>Note:</strong> The following fixes were applied directly to <code>main</code> as part of this audit. The remaining 3 blockers require architectural changes (full A2A JSON-RPC rewrite, MCP transport migration, real search provider) and are tracked below.
+    <div class="callout co-success">
+      <strong>Applied directly to main.</strong> The remaining 3 blockers require architectural changes (full A2A JSON-RPC rewrite, MCP transport migration, real search provider) and are tracked in §6.
     </div>
 
-    <div class="table-wrap">
+    <div class="tbl-wrap">
       <table>
-        <thead>
-          <tr>
-            <th>File</th>
-            <th>Fix</th>
-            <th>Status</th>
-          </tr>
-        </thead>
+        <thead><tr><th>File</th><th>Fix</th><th>Status</th></tr></thead>
         <tbody>
-          <tr>
-            <td class="cell-mono">planner_agent/main.py</td>
-            <td>Added <code>thread_id</code> to <code>RUN_STARTED</code> and <code>RUN_FINISHED</code></td>
-            <td class="cell-fixed">Fixed</td>
-          </tr>
-          <tr>
-            <td class="cell-mono">planner_agent/main.py</td>
-            <td>Renamed <code>name</code> → <code>step_name</code> in <code>STEP_STARTED</code> / <code>STEP_FINISHED</code></td>
-            <td class="cell-fixed">Fixed</td>
-          </tr>
-          <tr>
-            <td class="cell-mono">planner_agent/main.py</td>
-            <td>Replaced <code>STATE_DELTA</code> (snapshot object) with <code>STATE_SNAPSHOT</code> wrapped in <code>snapshot</code></td>
-            <td class="cell-fixed">Fixed</td>
-          </tr>
-          <tr>
-            <td class="cell-mono">planner_agent/main.py</td>
-            <td>Renamed <code>tool_name</code> → <code>tool_call_name</code>; moved args to new <code>TOOL_CALL_ARGS</code> event</td>
-            <td class="cell-fixed">Fixed</td>
-          </tr>
-          <tr>
-            <td class="cell-mono">planner_agent/main.py</td>
-            <td>Stripped <code>result</code> from <code>TOOL_CALL_END</code>; added separate <code>TOOL_CALL_RESULT</code> event</td>
-            <td class="cell-fixed">Fixed</td>
-          </tr>
-          <tr>
-            <td class="cell-mono">planner_agent/main.py</td>
-            <td>Renamed <code>content</code> → <code>delta</code> in <code>TEXT_MESSAGE_CONTENT</code>; added <code>message_id</code> to all three text events</td>
-            <td class="cell-fixed">Fixed</td>
-          </tr>
-          <tr>
-            <td class="cell-mono">planner_agent/main.py</td>
-            <td>Replaced non-spec <code>ERROR</code> → <code>RUN_ERROR</code>; LLM errors raised to emit proper <code>RUN_ERROR</code> instead of leaking into message content</td>
-            <td class="cell-fixed">Fixed</td>
-          </tr>
-          <tr>
-            <td class="cell-mono">planner_agent/main.py</td>
-            <td>Updated model from <code>claude-sonnet-4-20250514</code> → <code>claude-sonnet-4-6</code>; timeout 30s → 60s</td>
-            <td class="cell-fixed">Fixed</td>
-          </tr>
-          <tr>
-            <td class="cell-mono">search_agent/main.py</td>
-            <td>Fixed <code>capabilities.streaming: true</code>; added <code>defaultInputModes</code>, <code>defaultOutputModes</code>, skill <code>tags</code></td>
-            <td class="cell-fixed">Fixed</td>
-          </tr>
-          <tr>
-            <td class="cell-mono">search_agent/main.py</td>
-            <td>Added canonical <code>/.well-known/agent.json</code> alias alongside <code>/agent-card.json</code></td>
-            <td class="cell-fixed">Fixed</td>
-          </tr>
-          <tr>
-            <td class="cell-mono">search_agent/main.py</td>
-            <td>Applied same AG-UI field name fixes to the <code>/tasks/stream</code> endpoint</td>
-            <td class="cell-fixed">Fixed</td>
-          </tr>
-          <tr>
-            <td class="cell-mono">lib/agui-types.ts</td>
-            <td>Updated all TypeScript types to match spec: <code>step_name</code>, <code>tool_call_name</code>, <code>delta</code>, added <code>TOOL_CALL_ARGS</code>, <code>TOOL_CALL_RESULT</code>, <code>STATE_SNAPSHOT</code></td>
-            <td class="cell-fixed">Fixed</td>
-          </tr>
-          <tr>
-            <td class="cell-mono">components/app-state.tsx</td>
-            <td>Updated all event handlers to use new field names; added <code>TOOL_CALL_ARGS</code> and <code>TOOL_CALL_RESULT</code> handlers; moved results from <code>TOOL_CALL_END</code> to <code>TOOL_CALL_RESULT</code></td>
-            <td class="cell-fixed">Fixed</td>
-          </tr>
-          <tr>
-            <td class="cell-mono">hooks/use-agent-stream.ts</td>
-            <td>Added <code>STATE_SNAPSHOT</code>, <code>TOOL_CALL_ARGS</code>, <code>TOOL_CALL_RESULT</code> to <code>KNOWN_EVENTS</code></td>
-            <td class="cell-fixed">Fixed</td>
-          </tr>
-          <tr>
-            <td class="cell-mono">app/api/mock-planner/route.ts</td>
-            <td>Updated mock to emit spec-compliant events matching all the above fixes</td>
-            <td class="cell-fixed">Fixed</td>
-          </tr>
-          <tr>
-            <td class="cell-mono">docker-compose.yml</td>
-            <td>Added <code>restart: unless-stopped</code> to all 4 services</td>
-            <td class="cell-fixed">Fixed</td>
-          </tr>
+          <tr><td class="c-mono">planner_agent/main.py</td><td>Added <code>thread_id</code> to <code>RUN_STARTED</code> and <code>RUN_FINISHED</code></td><td class="c-fixed">Fixed</td></tr>
+          <tr><td class="c-mono">planner_agent/main.py</td><td>Renamed <code>name</code> → <code>step_name</code> in <code>STEP_STARTED</code> / <code>STEP_FINISHED</code></td><td class="c-fixed">Fixed</td></tr>
+          <tr><td class="c-mono">planner_agent/main.py</td><td>Replaced <code>STATE_DELTA</code> (snapshot object) with <code>STATE_SNAPSHOT</code> wrapped in <code>snapshot</code></td><td class="c-fixed">Fixed</td></tr>
+          <tr><td class="c-mono">planner_agent/main.py</td><td>Renamed <code>tool_name</code> → <code>tool_call_name</code>; moved args to new <code>TOOL_CALL_ARGS</code> event</td><td class="c-fixed">Fixed</td></tr>
+          <tr><td class="c-mono">planner_agent/main.py</td><td>Stripped <code>result</code> from <code>TOOL_CALL_END</code>; added separate <code>TOOL_CALL_RESULT</code> event</td><td class="c-fixed">Fixed</td></tr>
+          <tr><td class="c-mono">planner_agent/main.py</td><td>Renamed <code>content</code> → <code>delta</code> in <code>TEXT_MESSAGE_CONTENT</code>; added <code>message_id</code> to all three text events</td><td class="c-fixed">Fixed</td></tr>
+          <tr><td class="c-mono">planner_agent/main.py</td><td>Replaced <code>ERROR</code> → <code>RUN_ERROR</code>; LLM errors raise properly instead of leaking into message content</td><td class="c-fixed">Fixed</td></tr>
+          <tr><td class="c-mono">planner_agent/main.py</td><td>Model updated to <code>claude-sonnet-4-6</code>; timeout 30s → 60s for Render cold starts</td><td class="c-fixed">Fixed</td></tr>
+          <tr><td class="c-mono">search_agent/main.py</td><td>Fixed <code>capabilities.streaming: true</code>; added <code>defaultInputModes</code>, <code>defaultOutputModes</code>, skill <code>tags</code></td><td class="c-fixed">Fixed</td></tr>
+          <tr><td class="c-mono">search_agent/main.py</td><td>Added canonical <code>/.well-known/agent.json</code> alias alongside <code>/agent-card.json</code></td><td class="c-fixed">Fixed</td></tr>
+          <tr><td class="c-mono">search_agent/main.py</td><td>Applied same AG-UI field name fixes to the <code>/tasks/stream</code> endpoint</td><td class="c-fixed">Fixed</td></tr>
+          <tr><td class="c-mono">lib/agui-types.ts</td><td>Updated all TypeScript types: <code>step_name</code>, <code>tool_call_name</code>, <code>delta</code>, added <code>TOOL_CALL_ARGS</code>, <code>TOOL_CALL_RESULT</code>, <code>STATE_SNAPSHOT</code></td><td class="c-fixed">Fixed</td></tr>
+          <tr><td class="c-mono">components/app-state.tsx</td><td>Updated all event handlers; added <code>TOOL_CALL_ARGS</code> and <code>TOOL_CALL_RESULT</code> handlers; results moved to <code>TOOL_CALL_RESULT</code></td><td class="c-fixed">Fixed</td></tr>
+          <tr><td class="c-mono">hooks/use-agent-stream.ts</td><td>Added <code>STATE_SNAPSHOT</code>, <code>TOOL_CALL_ARGS</code>, <code>TOOL_CALL_RESULT</code> to <code>KNOWN_EVENTS</code></td><td class="c-fixed">Fixed</td></tr>
+          <tr><td class="c-mono">app/api/mock-planner/route.ts</td><td>Updated mock to emit spec-compliant events matching all fixes above</td><td class="c-fixed">Fixed</td></tr>
+          <tr><td class="c-mono">docker-compose.yml</td><td>Added <code>restart: unless-stopped</code> to all 4 services</td><td class="c-fixed">Fixed</td></tr>
         </tbody>
       </table>
     </div>
   </div>
 
-  <!-- ── AG-UI ── -->
-  <div class="section" id="agui">
-    <div class="section-header">
+  <!-- AG-UI -->
+  <div class="sec" id="agui">
+    <div class="sec-hd">
       <h2>1. AG-UI Protocol Compliance</h2>
-      <span class="status-badge badge-partial">Partial (post-fix)</span>
+      <span class="badge b-partial">Partial (post-fix)</span>
     </div>
 
-    <p>Checked against the installed <code>ag_ui/core/events.py</code> Pydantic models. Before this audit, all event fields were wrong. After fixes applied, the backend now emits spec-correct field names.</p>
+    <p>Checked against the installed <code>ag_ui/core/events.py</code> Pydantic models. Before this audit all event fields were wrong. After fixes, the backend emits spec-correct field names.</p>
 
-    <div class="sub-section">
-      <h3>1.1 Backend Event Emission (after fixes)</h3>
-      <div class="table-wrap">
-        <table>
-          <thead>
-            <tr><th>Event</th><th>Emitted</th><th>Payload</th><th>Notes</th></tr>
-          </thead>
-          <tbody>
-            <tr><td class="cell-mono">RUN_STARTED</td><td class="cell-pass">yes</td><td class="cell-fixed">fixed</td><td>Now includes <code>thread_id</code></td></tr>
-            <tr><td class="cell-mono">STEP_STARTED</td><td class="cell-pass">yes</td><td class="cell-fixed">fixed</td><td><code>name</code> → <code>step_name</code></td></tr>
-            <tr><td class="cell-mono">STEP_FINISHED</td><td class="cell-pass">yes</td><td class="cell-fixed">fixed</td><td><code>name</code> → <code>step_name</code></td></tr>
-            <tr><td class="cell-mono">STATE_SNAPSHOT</td><td class="cell-pass">yes</td><td class="cell-fixed">fixed</td><td>Replaced STATE_DELTA; wrapped in <code>snapshot</code></td></tr>
-            <tr><td class="cell-mono">TOOL_CALL_START</td><td class="cell-pass">yes</td><td class="cell-fixed">fixed</td><td><code>tool_name</code> → <code>tool_call_name</code>; args removed</td></tr>
-            <tr><td class="cell-mono">TOOL_CALL_ARGS</td><td class="cell-pass">yes</td><td class="cell-pass">correct</td><td>New — carries <code>{tool_call_id, delta}</code></td></tr>
-            <tr><td class="cell-mono">TOOL_CALL_END</td><td class="cell-pass">yes</td><td class="cell-fixed">fixed</td><td>Now only carries <code>tool_call_id</code></td></tr>
-            <tr><td class="cell-mono">TOOL_CALL_RESULT</td><td class="cell-pass">yes</td><td class="cell-pass">correct</td><td>New — carries <code>{message_id, tool_call_id, content, role}</code></td></tr>
-            <tr><td class="cell-mono">TEXT_MESSAGE_START</td><td class="cell-pass">yes</td><td class="cell-fixed">fixed</td><td>Now includes <code>message_id</code> and <code>role</code></td></tr>
-            <tr><td class="cell-mono">TEXT_MESSAGE_CONTENT</td><td class="cell-pass">yes</td><td class="cell-fixed">fixed</td><td><code>content</code> → <code>delta</code>; <code>message_id</code> added</td></tr>
-            <tr><td class="cell-mono">TEXT_MESSAGE_END</td><td class="cell-pass">yes</td><td class="cell-fixed">fixed</td><td><code>message_id</code> added</td></tr>
-            <tr><td class="cell-mono">RUN_FINISHED</td><td class="cell-pass">yes</td><td class="cell-fixed">fixed</td><td>Now includes <code>thread_id</code></td></tr>
-            <tr><td class="cell-mono">RUN_ERROR</td><td class="cell-pass">yes</td><td class="cell-fixed">fixed</td><td>Replaced non-spec <code>ERROR</code></td></tr>
-            <tr><td class="cell-mono">STATE_DELTA</td><td class="cell-muted">removed</td><td>—</td><td>Was misused; replaced by STATE_SNAPSHOT</td></tr>
-            <tr><td class="cell-mono">ag_ui Pydantic models</td><td class="cell-fail">unused</td><td>—</td><td>Still emitting raw strings; SDK validation still bypassed</td></tr>
-          </tbody>
-        </table>
-      </div>
+    <div class="sub-hd">1.1 Backend Event Emission (after fixes)</div>
+    <div class="tbl-wrap">
+      <table>
+        <thead><tr><th>Event</th><th>Emitted</th><th>Payload</th><th>Notes</th></tr></thead>
+        <tbody>
+          <tr><td class="c-mono">RUN_STARTED</td><td class="c-pass">yes</td><td class="c-fixed">fixed</td><td>Now includes <code>thread_id</code></td></tr>
+          <tr><td class="c-mono">STEP_STARTED</td><td class="c-pass">yes</td><td class="c-fixed">fixed</td><td><code>name</code> → <code>step_name</code></td></tr>
+          <tr><td class="c-mono">STEP_FINISHED</td><td class="c-pass">yes</td><td class="c-fixed">fixed</td><td><code>name</code> → <code>step_name</code></td></tr>
+          <tr><td class="c-mono">STATE_SNAPSHOT</td><td class="c-pass">yes</td><td class="c-fixed">fixed</td><td>Replaced STATE_DELTA; wrapped in <code>snapshot</code></td></tr>
+          <tr><td class="c-mono">TOOL_CALL_START</td><td class="c-pass">yes</td><td class="c-fixed">fixed</td><td><code>tool_name</code> → <code>tool_call_name</code>; args removed from START</td></tr>
+          <tr><td class="c-mono">TOOL_CALL_ARGS</td><td class="c-pass">yes</td><td class="c-pass">correct</td><td>New — carries <code>{tool_call_id, delta}</code></td></tr>
+          <tr><td class="c-mono">TOOL_CALL_END</td><td class="c-pass">yes</td><td class="c-fixed">fixed</td><td>Now only carries <code>tool_call_id</code></td></tr>
+          <tr><td class="c-mono">TOOL_CALL_RESULT</td><td class="c-pass">yes</td><td class="c-pass">correct</td><td>New — carries <code>{message_id, tool_call_id, content, role}</code></td></tr>
+          <tr><td class="c-mono">TEXT_MESSAGE_START</td><td class="c-pass">yes</td><td class="c-fixed">fixed</td><td><code>message_id</code> and <code>role</code> now present</td></tr>
+          <tr><td class="c-mono">TEXT_MESSAGE_CONTENT</td><td class="c-pass">yes</td><td class="c-fixed">fixed</td><td><code>content</code> → <code>delta</code>; <code>message_id</code> added</td></tr>
+          <tr><td class="c-mono">TEXT_MESSAGE_END</td><td class="c-pass">yes</td><td class="c-fixed">fixed</td><td><code>message_id</code> added</td></tr>
+          <tr><td class="c-mono">RUN_FINISHED</td><td class="c-pass">yes</td><td class="c-fixed">fixed</td><td>Now includes <code>thread_id</code></td></tr>
+          <tr><td class="c-mono">RUN_ERROR</td><td class="c-pass">yes</td><td class="c-fixed">fixed</td><td>Replaced non-spec <code>ERROR</code> event</td></tr>
+          <tr><td class="c-mono">ag_ui Pydantic models</td><td class="c-fail">unused</td><td>—</td><td>Still emitting raw strings; SDK validation still bypassed</td></tr>
+        </tbody>
+      </table>
     </div>
 
-    <div class="sub-section">
-      <h3>1.2 Frontend Event Handling (after fixes)</h3>
-      <div class="table-wrap">
-        <table>
-          <thead>
-            <tr><th>Event</th><th>Handled</th><th>Correct</th><th>Notes</th></tr>
-          </thead>
-          <tbody>
-            <tr><td class="cell-mono">STATE_SNAPSHOT</td><td class="cell-pass">yes</td><td class="cell-fixed">fixed</td><td>Reads <code>e.data.snapshot.*</code> correctly</td></tr>
-            <tr><td class="cell-mono">STEP_STARTED/FINISHED</td><td class="cell-pass">yes</td><td class="cell-fixed">fixed</td><td>Now reads <code>step_name</code></td></tr>
-            <tr><td class="cell-mono">TOOL_CALL_START</td><td class="cell-pass">yes</td><td class="cell-fixed">fixed</td><td>Reads <code>tool_call_name</code></td></tr>
-            <tr><td class="cell-mono">TOOL_CALL_ARGS</td><td class="cell-pass">yes</td><td class="cell-pass">correct</td><td>New handler; parses query from delta</td></tr>
-            <tr><td class="cell-mono">TOOL_CALL_END</td><td class="cell-pass">yes</td><td class="cell-fixed">fixed</td><td>No longer reads results (moved to TOOL_CALL_RESULT)</td></tr>
-            <tr><td class="cell-mono">TOOL_CALL_RESULT</td><td class="cell-pass">yes</td><td class="cell-pass">correct</td><td>New handler; parses JSON content for search results</td></tr>
-            <tr><td class="cell-mono">TEXT_MESSAGE_CONTENT</td><td class="cell-pass">yes</td><td class="cell-fixed">fixed</td><td>Reads <code>delta</code> only; dual-field fallback removed</td></tr>
-          </tbody>
-        </table>
-      </div>
+    <div class="sub-hd">1.2 Frontend Event Handling (after fixes)</div>
+    <div class="tbl-wrap">
+      <table>
+        <thead><tr><th>Event</th><th>Handled</th><th>Correct</th><th>Notes</th></tr></thead>
+        <tbody>
+          <tr><td class="c-mono">STATE_SNAPSHOT</td><td class="c-pass">yes</td><td class="c-fixed">fixed</td><td>Reads <code>e.data.snapshot.*</code> correctly</td></tr>
+          <tr><td class="c-mono">STEP_STARTED/FINISHED</td><td class="c-pass">yes</td><td class="c-fixed">fixed</td><td>Now reads <code>step_name</code></td></tr>
+          <tr><td class="c-mono">TOOL_CALL_START</td><td class="c-pass">yes</td><td class="c-fixed">fixed</td><td>Reads <code>tool_call_name</code></td></tr>
+          <tr><td class="c-mono">TOOL_CALL_ARGS</td><td class="c-pass">yes</td><td class="c-pass">correct</td><td>New handler; parses query from delta JSON</td></tr>
+          <tr><td class="c-mono">TOOL_CALL_END</td><td class="c-pass">yes</td><td class="c-fixed">fixed</td><td>No longer reads results (moved to TOOL_CALL_RESULT)</td></tr>
+          <tr><td class="c-mono">TOOL_CALL_RESULT</td><td class="c-pass">yes</td><td class="c-pass">correct</td><td>New handler; parses JSON content for search results</td></tr>
+          <tr><td class="c-mono">TEXT_MESSAGE_CONTENT</td><td class="c-pass">yes</td><td class="c-fixed">fixed</td><td>Reads <code>delta</code> only; dual-field fallback removed</td></tr>
+        </tbody>
+      </table>
     </div>
 
-    <div class="sub-section">
-      <h3>1.3 SSE Framing &amp; Lifecycle</h3>
-      <div class="callout callout-success">
-        <strong>PASS:</strong> SSE framing is correct — <code>event:\ndata:\n\n</code> format, CRLF normalization in parser, correct headers including <code>X-Accel-Buffering: no</code>. Run lifecycle is correctly ordered: RUN_STARTED first, RUN_FINISHED last, TEXT_MESSAGE_* in START→CONTENT→END order.
-      </div>
-      <div class="callout callout-warn">
-        <strong>Remaining:</strong> The <code>ag_ui.core</code> Pydantic models are still not used to construct or validate events. Events are raw format strings. This means schema drift between SDK and emitted events can reappear silently in future. Recommend using <code>model.model_dump_json(by_alias=True)</code> as the serialization path.
-      </div>
-    </div>
+    <div class="sub-hd">1.3 SSE Framing &amp; Lifecycle</div>
+    <div class="callout co-success"><strong>PASS:</strong> SSE framing correct — <code>event:\ndata:\n\n</code> format, CRLF normalization in parser, correct headers including <code>X-Accel-Buffering: no</code>. Run lifecycle is correctly ordered.</div>
+    <div class="callout co-warn"><strong>Remaining:</strong> The <code>ag_ui.core</code> Pydantic models are still not used to construct or validate events. Events are raw format strings — schema drift can reappear silently. Use <code>model.model_dump_json(by_alias=True)</code> as the serialization path.</div>
   </div>
 
-  <!-- ── A2A ── -->
-  <div class="section" id="a2a">
-    <div class="section-header">
+  <!-- A2A -->
+  <div class="sec" id="a2a">
+    <div class="sec-hd">
       <h2>2. A2A Protocol Compliance</h2>
-      <span class="status-badge badge-fail">Fail (partial fix)</span>
+      <span class="badge b-fail">Fail (partial fix)</span>
     </div>
 
-    <div class="callout callout-danger">
-      <strong>Architectural rewrite required.</strong> The planner→search communication is plain REST with custom request/response shapes. No real A2A client (Google A2A SDK, LangChain A2A adapter) can speak to this Search Agent.
-    </div>
+    <div class="callout co-danger"><strong>Architectural rewrite required.</strong> The planner→search communication is plain REST with custom shapes. No real A2A client (Google A2A SDK, LangChain A2A adapter) can speak to this Search Agent.</div>
 
-    <div class="table-wrap">
+    <div class="tbl-wrap">
       <table>
-        <thead>
-          <tr><th>Requirement</th><th>Status</th><th>Notes</th></tr>
-        </thead>
+        <thead><tr><th>Requirement</th><th>Status</th><th>Notes</th></tr></thead>
         <tbody>
-          <tr>
-            <td>Agent Card at <code>/.well-known/agent.json</code></td>
-            <td class="cell-fixed">Fixed</td>
-            <td>Both <code>/agent.json</code> and <code>/agent-card.json</code> now served</td>
-          </tr>
-          <tr>
-            <td><code>capabilities.streaming: true</code></td>
-            <td class="cell-fixed">Fixed</td>
-            <td>Was <code>false</code> despite streaming endpoint existing</td>
-          </tr>
-          <tr>
-            <td><code>defaultInputModes</code>, <code>defaultOutputModes</code></td>
-            <td class="cell-fixed">Fixed</td>
-            <td>Added to agent card</td>
-          </tr>
-          <tr>
-            <td>Skill <code>tags[]</code></td>
-            <td class="cell-fixed">Fixed</td>
-            <td>Added <code>["search","web","research"]</code></td>
-          </tr>
-          <tr>
-            <td>JSON-RPC 2.0 envelope (<code>method: "message/send"</code>)</td>
-            <td class="cell-fail">Open</td>
-            <td>Planner still sends plain <code>{task_id, skill, query}</code> POST</td>
-          </tr>
-          <tr>
-            <td><code>message.parts[{kind:"text", text:...}]</code> request shape</td>
-            <td class="cell-fail">Open</td>
-            <td>Not implemented</td>
-          </tr>
-          <tr>
-            <td><code>Task</code> object response with <code>status:{state,message,timestamp}</code></td>
-            <td class="cell-fail">Open</td>
-            <td>Returns <code>{task_id, status:"completed", result:{}}</code></td>
-          </tr>
-          <tr>
-            <td>Task state lifecycle (<code>submitted→working→completed</code>)</td>
-            <td class="cell-fail">Open</td>
-            <td>Only <code>"completed"</code> used</td>
-          </tr>
-          <tr>
-            <td>Planner calls streaming endpoint</td>
-            <td class="cell-fail">Open</td>
-            <td><code>/tasks/stream</code> exists but planner only hits <code>/tasks</code></td>
-          </tr>
+          <tr><td>Agent Card at <code>/.well-known/agent.json</code></td><td class="c-fixed">Fixed</td><td>Both <code>/agent.json</code> and <code>/agent-card.json</code> now served</td></tr>
+          <tr><td><code>capabilities.streaming: true</code></td><td class="c-fixed">Fixed</td><td>Was <code>false</code> despite streaming endpoint existing</td></tr>
+          <tr><td><code>defaultInputModes</code>, <code>defaultOutputModes</code></td><td class="c-fixed">Fixed</td><td>Added to agent card</td></tr>
+          <tr><td>Skill <code>tags[]</code></td><td class="c-fixed">Fixed</td><td>Added <code>["search","web","research"]</code></td></tr>
+          <tr><td>JSON-RPC 2.0 envelope (<code>method: "message/send"</code>)</td><td class="c-fail">Open</td><td>Planner still sends plain <code>{task_id, skill, query}</code> POST</td></tr>
+          <tr><td><code>message.parts[{kind:"text",text:...}]</code> request shape</td><td class="c-fail">Open</td><td>Not implemented</td></tr>
+          <tr><td><code>Task</code> object response with <code>status:{state,message,timestamp}</code></td><td class="c-fail">Open</td><td>Returns <code>{task_id, status:"completed", result:{}}</code></td></tr>
+          <tr><td>Task state lifecycle (<code>submitted→working→completed</code>)</td><td class="c-fail">Open</td><td>Only <code>"completed"</code> used</td></tr>
+          <tr><td>Planner calls streaming endpoint</td><td class="c-fail">Open</td><td><code>/tasks/stream</code> exists but planner only hits <code>/tasks</code></td></tr>
         </tbody>
       </table>
     </div>
-
-    <p>To achieve real A2A compliance: adopt the <code>a2a-sdk</code> Python package, switch the planner to JSON-RPC 2.0 <code>message/send</code>, and return a proper <code>Task</code> object with artifacts from the search agent.</p>
   </div>
 
-  <!-- ── MCP ── -->
-  <div class="section" id="mcp">
-    <div class="section-header">
+  <!-- MCP -->
+  <div class="sec" id="mcp">
+    <div class="sec-hd">
       <h2>3. MCP Protocol Compliance</h2>
-      <span class="status-badge badge-partial">Partial</span>
+      <span class="badge b-partial">Partial</span>
     </div>
 
-    <div class="table-wrap">
+    <div class="tbl-wrap">
       <table>
-        <thead>
-          <tr><th>Area</th><th>Status</th><th>Notes</th></tr>
-        </thead>
+        <thead><tr><th>Area</th><th>Status</th><th>Notes</th></tr></thead>
         <tbody>
-          <tr>
-            <td>FastMCP <code>@mcp.tool()</code> definitions</td>
-            <td class="cell-pass">Pass</td>
-            <td>Typed signature gives FastMCP enough to derive correct JSON Schema</td>
-          </tr>
-          <tr>
-            <td>MCP Client call pattern</td>
-            <td class="cell-pass">Pass</td>
-            <td><code>fastmcp.Client</code> + <code>call_tool()</code> is correct</td>
-          </tr>
-          <tr>
-            <td>Transport: SSE <code>transport="sse"</code></td>
-            <td class="cell-partial">Warn</td>
-            <td>Deprecated in MCP 1.7+. Spec now prefers Streamable HTTP (<code>transport="http"</code>)</td>
-          </tr>
-          <tr>
-            <td>Client URL hardcoded to <code>/sse</code></td>
-            <td class="cell-partial">Warn</td>
-            <td>Streamable HTTP uses <code>/mcp</code></td>
-          </tr>
-          <tr>
-            <td>New <code>Client</code> per request</td>
-            <td class="cell-partial">Warn</td>
-            <td>Re-establishes SSE connection on every request; should be a singleton</td>
-          </tr>
-          <tr>
-            <td>Tool error handling</td>
-            <td class="cell-fail">Fail</td>
-            <td><code>result.data if result.data else {}</code> silently swallows <code>isError</code>-flagged content</td>
-          </tr>
-          <tr>
-            <td><code>web_search</code> mock results</td>
-            <td class="cell-fail">Fail</td>
-            <td>Returns hardcoded <code>example.com</code> URLs; no real search provider integrated</td>
-          </tr>
+          <tr><td>FastMCP <code>@mcp.tool()</code> definitions</td><td class="c-pass">Pass</td><td>Typed signature gives FastMCP enough to derive correct JSON Schema</td></tr>
+          <tr><td>MCP Client call pattern</td><td class="c-pass">Pass</td><td><code>fastmcp.Client</code> + <code>call_tool()</code> is correct</td></tr>
+          <tr><td>Transport: SSE <code>transport="sse"</code></td><td class="c-partial">Warn</td><td>Deprecated in MCP 1.7+. Prefer Streamable HTTP (<code>transport="http"</code>)</td></tr>
+          <tr><td>Client URL hardcoded to <code>/sse</code></td><td class="c-partial">Warn</td><td>Streamable HTTP uses <code>/mcp</code></td></tr>
+          <tr><td>New <code>Client</code> per request</td><td class="c-partial">Warn</td><td>Re-establishes SSE connection on every request; should be a singleton</td></tr>
+          <tr><td>Tool error handling</td><td class="c-fail">Fail</td><td><code>result.data if result.data else {}</code> silently swallows <code>isError</code>-flagged content</td></tr>
+          <tr><td><code>web_search</code> implementation</td><td class="c-fail">Fail</td><td>Returns hardcoded <code>example.com</code> URLs; no real search provider integrated</td></tr>
         </tbody>
       </table>
     </div>
   </div>
 
-  <!-- ── Milestones ── -->
-  <div class="section" id="milestones">
-    <div class="section-header">
-      <h2>4. Milestone Completion</h2>
-    </div>
+  <!-- Milestones -->
+  <div class="sec" id="milestones">
+    <div class="sec-hd"><h2>4. Milestone Completion</h2></div>
 
-    <div class="table-wrap">
+    <div class="tbl-wrap">
       <table>
-        <thead>
-          <tr><th>Milestone</th><th>Complete</th><th>Gaps</th></tr>
-        </thead>
+        <thead><tr><th>Milestone</th><th>Complete</th><th>Gaps</th></tr></thead>
         <tbody>
-          <tr>
-            <td><strong>F1</strong> — UI scaffold</td>
-            <td class="cell-pass">Yes</td>
-            <td>Chat + activity panel, dark-first theme, Mobiz branding, responsive mobile tabs. Solid.</td>
-          </tr>
-          <tr>
-            <td><strong>F2</strong> — AG-UI streaming</td>
-            <td class="cell-partial">Partial</td>
-            <td>SSE client + state machine work. Was locked to non-spec backend payloads; fixed in this audit. <code>THINKING_*</code>, <code>MESSAGES_SNAPSHOT</code>, <code>STATE_DELTA</code> (JSON Patch) not handled.</td>
-          </tr>
-          <tr>
-            <td><strong>F3</strong> — Wire real agents</td>
-            <td class="cell-pass">Yes</td>
-            <td>Same-origin proxy + mock planner both work. Live demo confirmed in README.</td>
-          </tr>
-          <tr>
-            <td><strong>I1</strong> — Interface contracts</td>
-            <td class="cell-partial">Partial</td>
-            <td>Contracts now aligned with spec after fixes. <code>state_delta.py</code> TypedDict still named <code>StateDelta</code> though event is now <code>STATE_SNAPSHOT</code>.</td>
-          </tr>
-          <tr>
-            <td><strong>I2</strong> — Docker Compose</td>
-            <td class="cell-pass">Yes</td>
-            <td>4 services on correct ports with healthchecks + <code>service_healthy</code> ordering. <code>restart: unless-stopped</code> added.</td>
-          </tr>
-          <tr>
-            <td><strong>Planner → Search via A2A</strong></td>
-            <td class="cell-fail">Fail</td>
-            <td>Plain REST with custom shape. See §2.</td>
-          </tr>
-          <tr>
-            <td><strong>Search → Tool via MCP</strong></td>
-            <td class="cell-partial">Partial</td>
-            <td>Works via FastMCP on deprecated SSE transport.</td>
-          </tr>
+          <tr><td><strong>F1</strong> — UI scaffold</td><td class="c-pass">Yes</td><td>Chat + activity panel, dark-first theme, Mobiz branding, responsive mobile tabs. Solid.</td></tr>
+          <tr><td><strong>F2</strong> — AG-UI streaming</td><td class="c-partial">Partial</td><td>SSE client + state machine work. Was locked to non-spec backend payloads; fixed in this audit. <code>THINKING_*</code>, <code>MESSAGES_SNAPSHOT</code> not handled.</td></tr>
+          <tr><td><strong>F3</strong> — Wire real agents</td><td class="c-pass">Yes</td><td>Same-origin proxy + mock planner both work. Live demo confirmed in README.</td></tr>
+          <tr><td><strong>I1</strong> — Interface contracts</td><td class="c-partial">Partial</td><td>Contracts now aligned with spec after fixes. <code>state_delta.py</code> TypedDict still named <code>StateDelta</code> though event is now <code>STATE_SNAPSHOT</code>.</td></tr>
+          <tr><td><strong>I2</strong> — Docker Compose</td><td class="c-pass">Yes</td><td>4 services on correct ports with healthchecks. <code>restart: unless-stopped</code> added.</td></tr>
+          <tr><td><strong>Planner → Search via A2A</strong></td><td class="c-fail">Fail</td><td>Plain REST with custom shape. See §2.</td></tr>
+          <tr><td><strong>Search → Tool via MCP</strong></td><td class="c-partial">Partial</td><td>Works via FastMCP on deprecated SSE transport.</td></tr>
         </tbody>
       </table>
     </div>
   </div>
 
-  <!-- ── SDK Compat ── -->
-  <div class="section" id="sdk-compat">
-    <div class="section-header">
+  <!-- SDK Compat -->
+  <div class="sec" id="sdk">
+    <div class="sec-hd">
       <h2>5. CopilotKit / Vercel AI SDK Compatibility</h2>
-      <span class="status-badge badge-partial">Partial (improved)</span>
+      <span class="badge b-partial">Partial (improved)</span>
     </div>
 
-    <div class="sub-section">
-      <h3>CopilotKit (<code>useCoAgent</code>)</h3>
-      <p>After fixes, the backend now emits correct field names. Remaining blockers before CopilotKit's <code>HttpAgent</code> can consume this backend:</p>
-      <div class="callout callout-warn">
-        <strong>STATE_DELTA:</strong> CopilotKit applies JSON Patches internally. We now emit <code>STATE_SNAPSHOT</code> which CopilotKit handles as a full replacement — this is acceptable but means no incremental patching. Full JSON Patch support would require tracking previous state and computing RFC 6902 diffs.
-      </div>
-      <div class="callout callout-info">
-        The "CopilotKit" pill in <code>console-header.tsx</code> is cosmetic — no CopilotKit SDK is in <code>package.json</code>. Once the backend is confirmed spec-compliant, <code>useCoAgent</code> can replace the custom <code>use-agent-stream.ts</code> hook entirely.
-      </div>
-    </div>
+    <div class="sub-hd">CopilotKit (useCoAgent)</div>
+    <p>After fixes, the backend now emits correct field names. CopilotKit's <code>HttpAgent</code> can now consume <code>STATE_SNAPSHOT</code> as a full state replacement (not incremental JSON Patch — acceptable). The "CopilotKit" pill in <code>console-header.tsx</code> is cosmetic — no SDK is in <code>package.json</code>. Once backend is confirmed spec-compliant, <code>useCoAgent</code> can replace the custom <code>use-agent-stream.ts</code> hook entirely.</p>
 
-    <div class="sub-section">
-      <h3>Vercel AI SDK (<code>useChat</code>)</h3>
-      <p>Vercel AI SDK uses a different wire protocol (<code>0:</code>/<code>1:</code>/<code>9:</code> prefixed data lines) — fundamentally incompatible framing. Not a drop-in. Vercel <em>deployment</em> plumbing (Next.js config, same-origin proxy route) is correctly structured for Vercel hosting.</p>
-    </div>
+    <div class="sub-hd">Vercel AI SDK (useChat)</div>
+    <p>Vercel AI SDK uses a different wire protocol (<code>0:</code>/<code>1:</code>/<code>9:</code> prefixed data lines) — fundamentally incompatible framing. Not a drop-in. Vercel deployment plumbing (Next.js config, same-origin proxy) is correctly structured for Vercel hosting.</p>
   </div>
 
-  <!-- ── Critical Bugs ── -->
-  <div class="section" id="blockers">
-    <div class="section-header">
-      <h2>6. Critical Bugs</h2>
-    </div>
+  <!-- Critical Bugs -->
+  <div class="sec" id="blockers">
+    <div class="sec-hd"><h2>6. Critical Bugs</h2></div>
 
-    <div class="bug-list">
-      <div class="bug-card fixed">
+    <div class="bugs">
+      <div class="bug fixed">
         <div class="bug-num">#1</div>
-        <div class="bug-body">
+        <div>
           <div class="bug-title">RUN_STARTED / RUN_FINISHED missing <code>thread_id</code></div>
           <div class="bug-detail">Spec requires <code>{thread_id, run_id}</code>. Backend only sent <code>{run_id}</code>. CopilotKit and other clients would reject or lose thread context.</div>
         </div>
-        <span class="tag tag-fixed">Fixed</span>
+        <span class="tag t-fixed">Fixed</span>
       </div>
-      <div class="bug-card fixed">
+      <div class="bug fixed">
         <div class="bug-num">#2</div>
-        <div class="bug-body">
+        <div>
           <div class="bug-title">STATE_DELTA payload was a snapshot object, not RFC 6902 JSON Patch</div>
-          <div class="bug-detail">Spec: <code>delta: List[Any]</code> (JSON Patch). Backend sent <code>{active_agent, step, tool_calls}</code>. Renamed to <code>STATE_SNAPSHOT</code> with correct <code>snapshot</code> wrapper.</div>
+          <div class="bug-detail">Spec: <code>delta: List[Any]</code>. Backend sent <code>{active_agent, step, tool_calls}</code>. Renamed to <code>STATE_SNAPSHOT</code> with correct <code>snapshot</code> wrapper.</div>
         </div>
-        <span class="tag tag-fixed">Fixed</span>
+        <span class="tag t-fixed">Fixed</span>
       </div>
-      <div class="bug-card fixed">
+      <div class="bug fixed">
         <div class="bug-num">#3</div>
-        <div class="bug-body">
+        <div>
           <div class="bug-title">TEXT_MESSAGE_CONTENT used <code>content</code> instead of <code>delta</code>; missing <code>message_id</code></div>
-          <div class="bug-detail">Standard AG-UI consumers (CopilotKit, LangGraph UI) would render empty bubbles. Renamed to <code>delta</code> and <code>message_id</code> added to all three TEXT_MESSAGE events.</div>
+          <div class="bug-detail">Standard AG-UI consumers would render empty bubbles. Renamed to <code>delta</code> and <code>message_id</code> added to all three TEXT_MESSAGE events.</div>
         </div>
-        <span class="tag tag-fixed">Fixed</span>
+        <span class="tag t-fixed">Fixed</span>
       </div>
-      <div class="bug-card fixed">
+      <div class="bug fixed">
         <div class="bug-num">#4</div>
-        <div class="bug-body">
-          <div class="bug-title">TOOL_CALL_START used <code>tool_name</code> / stuffed args in wrong event</div>
+        <div>
+          <div class="bug-title">TOOL_CALL_START used <code>tool_name</code> and stuffed args in wrong event</div>
           <div class="bug-detail">Spec: <code>tool_call_name</code> in START; args in a separate TOOL_CALL_ARGS event with <code>delta: string</code>. Both fixed.</div>
         </div>
-        <span class="tag tag-fixed">Fixed</span>
+        <span class="tag t-fixed">Fixed</span>
       </div>
-      <div class="bug-card fixed">
+      <div class="bug fixed">
         <div class="bug-num">#5</div>
-        <div class="bug-body">
-          <div class="bug-title">TOOL_CALL_END carried result instead of TOOL_CALL_RESULT</div>
-          <div class="bug-detail">Spec: END carries only <code>tool_call_id</code>; result is a separate TOOL_CALL_RESULT event with <code>{message_id, tool_call_id, content: string, role: "tool"}</code>. Both events now correct.</div>
+        <div>
+          <div class="bug-title">TOOL_CALL_END carried result instead of using TOOL_CALL_RESULT</div>
+          <div class="bug-detail">Spec: END carries only <code>tool_call_id</code>; result belongs in TOOL_CALL_RESULT with <code>{message_id, tool_call_id, content: string, role: "tool"}</code>. Both events now correct.</div>
         </div>
-        <span class="tag tag-fixed">Fixed</span>
+        <span class="tag t-fixed">Fixed</span>
       </div>
-      <div class="bug-card fixed">
+      <div class="bug fixed">
         <div class="bug-num">#6</div>
-        <div class="bug-body">
-          <div class="bug-title">Non-spec ERROR event; early return without RUN_FINISHED</div>
-          <div class="bug-detail">Backend emitted <code>ERROR</code> and returned early, leaving spec-conformant consumers hanging. Now emits <code>RUN_ERROR</code> (terminal event per spec; no RUN_FINISHED needed after it). LLM errors raised to correct handler instead of leaking into message content.</div>
+        <div>
+          <div class="bug-title">Non-spec ERROR event; LLM errors leaked into message content</div>
+          <div class="bug-detail">Backend emitted <code>ERROR</code> and LLM failures were yielded as visible message text. Now emits <code>RUN_ERROR</code> (terminal per spec); LLM errors raised to correct handler.</div>
         </div>
-        <span class="tag tag-fixed">Fixed</span>
+        <span class="tag t-fixed">Fixed</span>
       </div>
-      <div class="bug-card fixed">
+      <div class="bug fixed">
         <div class="bug-num">#7</div>
-        <div class="bug-body">
-          <div class="bug-title">Agent card: <code>capabilities.streaming: false</code> was wrong; missing card fields; wrong canonical path</div>
+        <div>
+          <div class="bug-title">Agent card: <code>streaming: false</code>, missing fields, wrong canonical path</div>
           <div class="bug-detail">Fixed: <code>streaming: true</code>, added <code>defaultInputModes</code>/<code>defaultOutputModes</code>, <code>tags[]</code> on skills, both <code>/.well-known/agent.json</code> and <code>/agent-card.json</code> now served.</div>
         </div>
-        <span class="tag tag-fixed">Fixed</span>
+        <span class="tag t-fixed">Fixed</span>
       </div>
-      <div class="bug-card open">
+      <div class="bug open">
         <div class="bug-num">#8</div>
-        <div class="bug-body">
+        <div>
           <div class="bug-title">A2A request/response shape is not JSON-RPC 2.0</div>
-          <div class="bug-detail">Planner sends plain <code>{task_id, skill, query}</code>. Spec: JSON-RPC 2.0 with <code>method: "message/send"</code> and <code>params.message.parts[]</code>. Requires architectural rewrite using <code>a2a-sdk</code>.</div>
+          <div class="bug-detail">Planner sends plain <code>{task_id, skill, query}</code>. Spec requires JSON-RPC 2.0 with <code>method: "message/send"</code> and <code>params.message.parts[]</code>. Requires architectural rewrite using <code>a2a-sdk</code>.</div>
         </div>
-        <span class="tag tag-open">Open</span>
+        <span class="tag t-open">Open</span>
       </div>
-      <div class="bug-card open">
+      <div class="bug open">
         <div class="bug-num">#9</div>
-        <div class="bug-body">
+        <div>
           <div class="bug-title">MCP server on deprecated SSE transport</div>
-          <div class="bug-detail"><code>transport="sse"</code> deprecated in MCP 1.7+. Switch to <code>transport="http"</code> (Streamable HTTP). Client URL <code>/sse</code> → <code>/mcp</code>. Also: new <code>Client</code> per request should be a long-lived singleton.</div>
+          <div class="bug-detail"><code>transport="sse"</code> deprecated in MCP 1.7+. Switch to <code>transport="http"</code>. Client URL <code>/sse</code> → <code>/mcp</code>. Also: new <code>Client</code> per request should be a long-lived singleton.</div>
         </div>
-        <span class="tag tag-open">Open</span>
+        <span class="tag t-open">Open</span>
       </div>
-      <div class="bug-card open">
+      <div class="bug open">
         <div class="bug-num">#10</div>
-        <div class="bug-body">
+        <div>
           <div class="bug-title">web_search returns hardcoded mock results</div>
-          <div class="bug-detail">All queries return <code>example.com</code> URLs. README implies real search. Integrate Tavily, Brave, or Serper to deliver on the "research assistant" premise.</div>
+          <div class="bug-detail">All queries return <code>example.com</code> URLs. README implies real search. Integrate Tavily, Brave, or Serper to deliver on the research-assistant premise.</div>
         </div>
-        <span class="tag tag-open">Open</span>
+        <span class="tag t-open">Open</span>
       </div>
     </div>
   </div>
 
-  <!-- ── Minor Issues ── -->
-  <div class="section" id="minor">
-    <div class="section-header">
-      <h2>7. Non-Critical Issues</h2>
-    </div>
+  <!-- Non-Critical -->
+  <div class="sec" id="minor">
+    <div class="sec-hd"><h2>7. Non-Critical Issues</h2></div>
 
-    <div class="bug-list">
-      <div class="bug-card warn">
+    <div class="bugs">
+      <div class="bug minor">
         <div class="bug-num">M1</div>
-        <div class="bug-body">
+        <div>
           <div class="bug-title">Only latest user message used server-side</div>
-          <div class="bug-detail"><code>planner_agent/main.py</code> takes only the last user message; full conversation history sent by frontend is discarded. Effectively single-turn despite a stateful client.</div>
+          <div class="bug-detail">Full conversation history sent by frontend is discarded. Effectively single-turn despite a stateful client.</div>
         </div>
         <div class="bug-loc">planner_agent/main.py</div>
       </div>
-      <div class="bug-card warn">
+      <div class="bug minor">
         <div class="bug-num">M2</div>
-        <div class="bug-body">
+        <div>
           <div class="bug-title"><code>ag-ui-protocol</code> package declared but never imported</div>
-          <div class="bug-detail">Events emitted as raw format strings; the SDK's Pydantic models and schema validation are bypassed. Recommend using <code>model.model_dump_json(by_alias=True)</code>.</div>
+          <div class="bug-detail">Events emitted as raw format strings; Pydantic models and schema validation bypassed. Use <code>model.model_dump_json(by_alias=True)</code>.</div>
         </div>
         <div class="bug-loc">requirements.txt:6</div>
       </div>
-      <div class="bug-card warn">
+      <div class="bug minor">
         <div class="bug-num">M3</div>
-        <div class="bug-body">
-          <div class="bug-title"><code>web_search</code> tool raises NotImplementedError in contracts</div>
-          <div class="bug-detail"><code>contracts/tools.py</code> has a <code>web_search()</code> stub that raises <code>NotImplementedError</code>. Not imported by any agent. Dead code.</div>
+        <div>
+          <div class="bug-title"><code>web_search()</code> raises NotImplementedError in contracts</div>
+          <div class="bug-detail">Not imported by any agent. Dead code that creates a false impression of a contract being enforced.</div>
         </div>
         <div class="bug-loc">contracts/tools.py:16-34</div>
       </div>
-      <div class="bug-card warn">
+      <div class="bug minor">
         <div class="bug-num">M4</div>
-        <div class="bug-body">
-          <div class="bug-title"><code>next.config.mjs</code> silences all TS build errors</div>
-          <div class="bug-detail"><code>typescript.ignoreBuildErrors: true</code> hides the react-markdown v10 / @types/react v19 conflict. Pin a compatible react-markdown version instead.</div>
+        <div>
+          <div class="bug-title"><code>typescript.ignoreBuildErrors: true</code> silences all TS errors</div>
+          <div class="bug-detail">Hides the react-markdown v10 / @types/react v19 conflict. Pin a compatible react-markdown version instead.</div>
         </div>
         <div class="bug-loc">next.config.mjs:6</div>
       </div>
-      <div class="bug-card warn">
+      <div class="bug minor">
         <div class="bug-num">M5</div>
-        <div class="bug-body">
-          <div class="bug-title">"CopilotKit" pill in header — no CopilotKit SDK present</div>
-          <div class="bug-detail"><code>console-header.tsx</code> advertises CopilotKit as part of the stack; it is not in <code>package.json</code>. Remove or actually adopt CopilotKit.</div>
+        <div>
+          <div class="bug-title">"CopilotKit" pill in header — no SDK present</div>
+          <div class="bug-detail">Advertises CopilotKit as part of the stack; it is not in <code>package.json</code>. Remove or adopt the SDK.</div>
         </div>
         <div class="bug-loc">components/console-header.tsx:9</div>
       </div>
-      <div class="bug-card warn">
+      <div class="bug minor">
         <div class="bug-num">M6</div>
-        <div class="bug-body">
+        <div>
           <div class="bug-title">ANTHROPIC_API_KEY silently defaults to empty string in Docker</div>
-          <div class="bug-detail"><code>${ANTHROPIC_API_KEY:-}</code> falls through to the mock LLM path silently. Should warn or fail loudly when absent to avoid confusing "working but not LLM-backed" state.</div>
+          <div class="bug-detail"><code>${ANTHROPIC_API_KEY:-}</code> falls through to mock LLM path silently. Should warn or fail loudly when absent.</div>
         </div>
         <div class="bug-loc">docker-compose.yml:49</div>
       </div>
-      <div class="bug-card warn">
+      <div class="bug minor">
         <div class="bug-num">M7</div>
-        <div class="bug-body">
-          <div class="bug-title">MCP tool error results silently swallowed</div>
-          <div class="bug-detail"><code>result.data if result.data else {}</code> masks <code>isError</code>-flagged tool content. Any tool-side error becomes an empty dict.</div>
+        <div>
+          <div class="bug-title">MCP tool errors silently swallowed</div>
+          <div class="bug-detail"><code>result.data if result.data else {}</code> masks <code>isError</code>-flagged content. Any tool-side error becomes an empty dict.</div>
         </div>
         <div class="bug-loc">search_agent/main.py:107</div>
       </div>
-      <div class="bug-card warn">
+      <div class="bug minor">
         <div class="bug-num">M8</div>
-        <div class="bug-body">
+        <div>
           <div class="bug-title"><code>requirements.txt</code> saved as UTF-16 LE with BOM</div>
           <div class="bug-detail">pip handles it, but the encoding causes diff noise and confuses editors. Re-save as UTF-8.</div>
         </div>
@@ -1098,58 +646,47 @@
     </div>
   </div>
 
-  <!-- ── Verdict ── -->
-  <div class="section" id="verdict">
-    <div class="section-header">
-      <h2>8. Verdict &amp; Production Roadmap</h2>
-    </div>
+  <!-- Verdict -->
+  <div class="sec" id="verdict">
+    <div class="sec-hd"><h2>8. Verdict &amp; Production Roadmap</h2></div>
 
-    <div class="callout callout-danger">
-      <strong>PROTOTYPE-ONLY.</strong> Excellent visual demo and well-engineered frontend. Protocol fidelity to AG-UI is substantially improved by this audit (7 blockers fixed). A2A and MCP remain non-conformant and require architectural investment.
-    </div>
+    <div class="callout co-danger"><strong>PROTOTYPE-ONLY.</strong> Excellent visual demo and well-engineered frontend. AG-UI fidelity substantially improved by this audit (7 blockers fixed). A2A and MCP remain non-conformant and require architectural investment.</div>
 
-    <div class="sub-section">
-      <h3>Top 5 tasks before production</h3>
-      <div class="priority-grid">
-        <div class="priority-item">
-          <div class="pri-num">1</div>
-          <div class="pri-body">
-            <div class="pri-title">Use <code>ag_ui.core</code> Pydantic models as the serialization source</div>
-            <div class="pri-desc">Serialize all events with <code>.model_dump_json(by_alias=True)</code> to guarantee schema compliance and make future spec upgrades automatic.</div>
-          </div>
-          <div class="pri-impact">AG-UI fidelity</div>
+    <div class="sub-hd">Top 5 tasks before production</div>
+    <div class="plist">
+      <div class="pitem">
+        <div class="pnum">1</div>
+        <div>
+          <div class="ptitle">Use <code>ag_ui.core</code> Pydantic models as the serialization source</div>
+          <div class="pdesc">Serialize all events with <code>.model_dump_json(by_alias=True)</code> to guarantee schema compliance and make future spec upgrades automatic.</div>
         </div>
-        <div class="priority-item">
-          <div class="pri-num">2</div>
-          <div class="pri-body">
-            <div class="pri-title">Rewrite planner → search as JSON-RPC 2.0 A2A</div>
-            <div class="pri-desc">Use <code>a2a-sdk</code> Python package. <code>method: "message/send"</code>, <code>message.parts[]</code> envelope, <code>Task</code> object response with artifacts. Planner should call <code>/tasks/stream</code> for real-time progress.</div>
-          </div>
-          <div class="pri-impact">A2A interop</div>
+      </div>
+      <div class="pitem">
+        <div class="pnum">2</div>
+        <div>
+          <div class="ptitle">Rewrite planner → search as JSON-RPC 2.0 A2A</div>
+          <div class="pdesc">Use <code>a2a-sdk</code> Python package. <code>method: "message/send"</code>, <code>message.parts[]</code> envelope, <code>Task</code> object response with artifacts.</div>
         </div>
-        <div class="priority-item">
-          <div class="pri-num">3</div>
-          <div class="pri-body">
-            <div class="pri-title">Switch MCP to Streamable HTTP transport</div>
-            <div class="pri-desc"><code>mcp.run(transport="http")</code>, client URL to <code>/mcp</code>. Reuse a singleton <code>Client</code> in the search agent instead of re-connecting per request.</div>
-          </div>
-          <div class="pri-impact">MCP spec compliance</div>
+      </div>
+      <div class="pitem">
+        <div class="pnum">3</div>
+        <div>
+          <div class="ptitle">Switch MCP to Streamable HTTP transport</div>
+          <div class="pdesc"><code>mcp.run(transport="http")</code>, client URL to <code>/mcp</code>. Reuse a singleton <code>Client</code> in the search agent.</div>
         </div>
-        <div class="priority-item">
-          <div class="pri-num">4</div>
-          <div class="pri-body">
-            <div class="pri-title">Integrate a real web search provider</div>
-            <div class="pri-desc">Tavily, Brave Search, or Serper. The live demo currently returns hardcoded <code>example.com</code> URLs — this undermines the "research assistant" premise entirely.</div>
-          </div>
-          <div class="pri-impact">Demo honesty</div>
+      </div>
+      <div class="pitem">
+        <div class="pnum">4</div>
+        <div>
+          <div class="ptitle">Integrate a real web search provider</div>
+          <div class="pdesc">Tavily, Brave Search, or Serper. The live demo currently returns hardcoded <code>example.com</code> URLs — the "research assistant" premise is undermined.</div>
         </div>
-        <div class="priority-item">
-          <div class="pri-num">5</div>
-          <div class="pri-body">
-            <div class="pri-title">Replace custom SSE hook with <code>useCoAgent</code></div>
-            <div class="pri-desc">Once #1 lands, <code>use-agent-stream.ts</code> (~145 lines) can be removed entirely. Remove the cosmetic CopilotKit pill or actually adopt the SDK.</div>
-          </div>
-          <div class="pri-impact">SDK adoption</div>
+      </div>
+      <div class="pitem">
+        <div class="pnum">5</div>
+        <div>
+          <div class="ptitle">Replace custom SSE hook with <code>useCoAgent</code></div>
+          <div class="pdesc">Once #1 lands, <code>use-agent-stream.ts</code> (~145 lines) can be deleted. Remove the cosmetic CopilotKit pill or actually adopt the SDK.</div>
         </div>
       </div>
     </div>
@@ -1161,7 +698,5 @@
   </footer>
 
 </main>
-</div>
-
 </body>
 </html>
