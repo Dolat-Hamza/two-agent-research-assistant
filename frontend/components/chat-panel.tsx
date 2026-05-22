@@ -1,23 +1,16 @@
 "use client";
 
-import { useEffect, useRef } from "react";
 import { Sparkles, AlertTriangle, RotateCcw } from "lucide-react";
 import { useAppState } from "@/components/app-state";
 import { ChatBubble } from "@/components/chat-bubble";
 import { ThinkingBubble } from "@/components/thinking-bubble";
 import { Composer } from "@/components/composer";
+import { useStickToBottom } from "@/hooks/use-stick-to-bottom";
 import { SUGGESTIONS } from "@/lib/mock-data";
 
 export function ChatPanel() {
   const { messages, status, errorMessage, sendMessage, clearThread } = useAppState();
-  const scrollRef = useRef<HTMLDivElement>(null);
-
-  // Auto-scroll to bottom on new content / status changes.
-  useEffect(() => {
-    const el = scrollRef.current;
-    if (!el) return;
-    el.scrollTo({ top: el.scrollHeight, behavior: "smooth" });
-  }, [messages, status]);
+  const scrollRef = useStickToBottom<HTMLDivElement>([messages, status]);
 
   const lastMessage = messages.at(-1);
   // Show the thinking placeholder once a run starts and before the assistant
@@ -44,11 +37,12 @@ export function ChatPanel() {
         )}
       </div>
 
-      {/* Scrollable conversation */}
+      {/* Scrollable conversation. No `aria-live` here — token streaming would
+          flood screen readers. The error card below uses role="alert" for
+          its own announcement. */}
       <div
         ref={scrollRef}
         className="flex-1 min-h-0 overflow-y-auto px-4 py-5 space-y-5"
-        aria-live="polite"
       >
         {messages.length === 0 ? (
           <EmptyState onPick={sendMessage} />
@@ -62,7 +56,10 @@ export function ChatPanel() {
         )}
 
         {errorMessage && status === "error" && (
-          <div className="rounded-md bg-err/10 ring-1 ring-err/30 px-3 py-2 text-[12.5px] text-err animate-fade-up">
+          <div
+            role="alert"
+            className="rounded-md bg-err/10 ring-1 ring-err/30 px-3 py-2 text-[12.5px] text-err animate-fade-up"
+          >
             <div className="flex items-center gap-2">
               <AlertTriangle className="h-3.5 w-3.5 shrink-0" />
               <span className="font-medium">Something went wrong</span>
@@ -88,7 +85,7 @@ function EmptyState({ onPick }: { onPick: (text: string) => void }) {
         <div className="text-[15px] font-medium text-foreground">Ask the agents anything</div>
         <p className="text-[12.5px] text-muted max-w-sm">
           A <span className="text-foreground">Planner</span> and a{" "}
-          <span className="text-foreground">Search</span> agent will collaborate to answer your
+          <span className="text-foreground">Search </span> agent will collaborate to answer your
           question — you&apos;ll see them work live in the activity panel.
         </p>
       </div>

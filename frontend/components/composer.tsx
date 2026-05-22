@@ -34,6 +34,10 @@ export function Composer() {
   }
 
   function onKey(e: React.KeyboardEvent<HTMLTextAreaElement>) {
+    // Skip Enter while an IME composition is active so CJK users can confirm
+    // suggestions without accidentally submitting. `keyCode === 229` covers
+    // older browsers where `isComposing` isn't set.
+    if (e.nativeEvent.isComposing || e.keyCode === 229) return;
     if (e.key === "Enter" && !e.shiftKey) {
       e.preventDefault();
       submit();

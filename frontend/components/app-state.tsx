@@ -314,6 +314,10 @@ export function AppStateProvider({ children }: { children: React.ReactNode }) {
     setActiveAgent("idle");
     setStep("cancelled");
     finalizeStreamingMessage();
+    // Clear refs so any chunk that races past the abort can't append onto the
+    // finalised bubble or attach a stale tool card to the next run.
+    assistantMsgIdRef.current = null;
+    pendingToolRef.current = null;
   }, [cancel, finalizeStreamingMessage]);
 
   const clearThread = useCallback(() => {
