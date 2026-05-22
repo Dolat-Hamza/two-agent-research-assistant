@@ -197,7 +197,9 @@ async def receive_task_stream(task: TaskRequest):
                 result = await mcp_client.call_tool("web_search", {"query": task.query})
                 search_results = result.data if result.data else {}
         except Exception as e:
-            yield sse_event("RUN_ERROR", {"message": f"MCP Tool Server call failed: {str(e)}"})
+            yield sse_event(
+                "RUN_ERROR", {"message": f"MCP Tool Server call failed: {str(e)}"}
+            )
             return
 
         # spec: TOOL_CALL_END carries only tool_call_id

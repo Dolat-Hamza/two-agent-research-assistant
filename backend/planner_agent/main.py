@@ -139,7 +139,9 @@ async def agent_endpoint(request: PlannerRequest):
         result_msg_id = str(uuid.uuid4())
 
         # 1. RUN_STARTED — spec requires thread_id + run_id
-        yield sse_event("RUN_STARTED", {"thread_id": request.thread_id, "run_id": run_id})
+        yield sse_event(
+            "RUN_STARTED", {"thread_id": request.thread_id, "run_id": run_id}
+        )
 
         # 2. STEP_STARTED — spec field: step_name (not name)
         yield sse_event("STEP_STARTED", {"step_name": "Delegating to Search Agent"})
@@ -174,7 +176,10 @@ async def agent_endpoint(request: PlannerRequest):
         # 5. TOOL_CALL_ARGS — spec: separate event; delta is a JSON-encoded string
         yield sse_event(
             "TOOL_CALL_ARGS",
-            {"tool_call_id": tool_call_id, "delta": json.dumps({"query": user_message})},
+            {
+                "tool_call_id": tool_call_id,
+                "delta": json.dumps({"query": user_message}),
+            },
         )
 
         # 6. Call Search Agent via A2A
@@ -199,7 +204,9 @@ async def agent_endpoint(request: PlannerRequest):
                     )
                     return
         except Exception as e:
-            yield sse_event("RUN_ERROR", {"message": f"Search Agent call failed: {str(e)}"})
+            yield sse_event(
+                "RUN_ERROR", {"message": f"Search Agent call failed: {str(e)}"}
+            )
             return
 
         results_count = len(search_results.get("results", []))
@@ -242,12 +249,16 @@ async def agent_endpoint(request: PlannerRequest):
         yield sse_event("STEP_FINISHED", {"step_name": "Delegating to Search Agent"})
 
         # 11. TEXT_MESSAGE_START — message_id + role required by spec
-        yield sse_event("TEXT_MESSAGE_START", {"message_id": msg_id, "role": "assistant"})
+        yield sse_event(
+            "TEXT_MESSAGE_START", {"message_id": msg_id, "role": "assistant"}
+        )
 
         # 12. TEXT_MESSAGE_CONTENT — spec: delta (not content) + message_id
         try:
             async for token in stream_llm_tokens(user_message, search_results):
-                yield sse_event("TEXT_MESSAGE_CONTENT", {"message_id": msg_id, "delta": token})
+                yield sse_event(
+                    "TEXT_MESSAGE_CONTENT", {"message_id": msg_id, "delta": token}
+                )
         except RuntimeError as e:
             yield sse_event("TEXT_MESSAGE_END", {"message_id": msg_id})
             yield sse_event("RUN_ERROR", {"message": str(e)})
@@ -257,7 +268,9 @@ async def agent_endpoint(request: PlannerRequest):
         yield sse_event("TEXT_MESSAGE_END", {"message_id": msg_id})
 
         # 14. RUN_FINISHED — spec requires thread_id + run_id
-        yield sse_event("RUN_FINISHED", {"thread_id": request.thread_id, "run_id": run_id})
+        yield sse_event(
+            "RUN_FINISHED", {"thread_id": request.thread_id, "run_id": run_id}
+        )
 
     return StreamingResponse(
         event_stream(),
