@@ -109,8 +109,11 @@ function parseSseFrame(frame: string): AnyAgentEvent | null {
   }
   const data = dataLines.join("\n");
   if (!event || !data) return null;
+  // The Planner Agent emits `ERROR` for upstream failures; the frontend models
+  // them as RUN_ERROR. Normalize here so the handler only has one case.
+  const type = event === "ERROR" ? "RUN_ERROR" : event;
   try {
-    return { type: event as AnyAgentEvent["type"], data: JSON.parse(data) } as AnyAgentEvent;
+    return { type: type as AnyAgentEvent["type"], data: JSON.parse(data) } as AnyAgentEvent;
   } catch {
     return null;
   }

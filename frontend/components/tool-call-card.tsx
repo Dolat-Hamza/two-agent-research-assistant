@@ -5,6 +5,8 @@ import { ChevronDown, Loader2, Wrench, CheckCircle2 } from "lucide-react";
 import { cn } from "@/lib/utils";
 import type { SearchResult } from "@/lib/agui-types";
 
+const HTTP_URL = /^https?:\/\//i;
+
 export function ToolCallCard({
   name,
   query,
@@ -59,10 +61,18 @@ export function ToolCallCard({
           {results.map((r) => (
             <div key={r.url} className="px-3 py-2.5 hover:bg-panel/60 transition-colors">
               <div className="text-foreground text-[13px] leading-snug">{r.title}</div>
-              {/* TODO(F3): once B1 returns absolute URLs (with protocol), render this as
-                  <a href={r.url} target="_blank" rel="noopener noreferrer"> so the link
-                  is actually navigable. Today the mock emits bare hostnames. */}
-              <span className="text-[11px] text-mcp/90 break-all">{r.url}</span>
+              {HTTP_URL.test(r.url) ? (
+                <a
+                  href={r.url}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="text-[11px] text-mcp/90 break-all hover:underline hover:text-mcp"
+                >
+                  {r.url}
+                </a>
+              ) : (
+                <span className="text-[11px] text-mcp/90 break-all">{r.url}</span>
+              )}
               <div className="mt-1 text-[12px] text-muted leading-snug">{r.snippet}</div>
             </div>
           ))}
