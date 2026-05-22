@@ -4,11 +4,12 @@ import { useEffect } from "react";
 import { AlertTriangle, RotateCcw } from "lucide-react";
 
 /**
- * App-level error boundary. Next.js routes uncaught render-time errors here
- * so a single throw can't leave the user with a blank tab. The reset() call
- * remounts the route subtree.
+ * Route-level error boundary. Catches render-time errors in child route
+ * segments (i.e. anything under `app/page.tsx`). Errors in the ROOT layout
+ * itself — ThemeProvider, AppStateProvider — go to `app/global-error.tsx`.
+ * The reset() call remounts this route's subtree.
  */
-export default function GlobalError({
+export default function RouteError({
   error,
   reset,
 }: {

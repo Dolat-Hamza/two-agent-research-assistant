@@ -1,10 +1,13 @@
 /**
  * Typed env-var access for the frontend.
  *
- * No silent defaults: every required variable must be explicitly set in
- * `.env.local` (copy from `.env.example`). Missing values throw at module
- * load time so misconfiguration is visible immediately instead of producing
- * mystery 404s or cross-origin requests at runtime.
+ * Required vars are validated on first read, not at module load. Reasoning:
+ * `NEXT_PUBLIC_*` values are inlined by the Next.js compiler at build time,
+ * but the module's *body* still runs on the server during SSR and during
+ * `next build`. A module-level throw would crash CI builds that don't have
+ * `.env.local`. Lazy access means the build succeeds and the failure
+ * surfaces in the browser the first time a user actually starts a run —
+ * with a clear directive message.
  */
 
 function requireEnv(name: string, value: string | undefined): string {
@@ -12,7 +15,8 @@ function requireEnv(name: string, value: string | undefined): string {
   if (!trimmed) {
     throw new Error(
       `Missing required env var ${name}. Copy frontend/.env.example to ` +
-        `frontend/.env.local and fill it in, then restart \`npm run dev\`.`,
+        `frontend/.env.local and fill it in, then restart the dev server ` +
+        `(or rebuild for production).`,
     );
   }
   return trimmed;
@@ -21,14 +25,13 @@ function requireEnv(name: string, value: string | undefined): string {
 /**
  * SSE endpoint the browser POSTs the planner request to.
  *
- *   - Set to `/api/agent` to use the same-origin proxy (recommended; backend
- *     stays CORS-free).
- *   - Set to `/api/mock-planner` to drive the UI from the in-process mock
- *     when no backend is running.
- *   - Set to an absolute URL (`http://planner.staging…/agent`) only if the
- *     upstream allows CORS from this origin.
+ *   - `/api/agent`         — same-origin proxy (recommended; backend stays CORS-free)
+ *   - `/api/mock-planner`  — drive the UI from the in-process mock, no backend
+ *   - absolute URL         — only if upstream allows CORS from this origin
+ *
+ * Resolved on first call so `next build` doesn't crash when `.env.local` is
+ * absent on the build host. The throw fires the first time the SSE hook runs.
  */
-export const AGENT_URL: string = requireEnv(
-  "NEXT_PUBLIC_AGENT_URL",
-  process.env.NEXT_PUBLIC_AGENT_URL,
-);
+export function getAgentUrl(): string {
+  return requireEnv("NEXT_PUBLIC_AGENT_URL", process.env.NEXT_PUBLIC_AGENT_URL);
+}

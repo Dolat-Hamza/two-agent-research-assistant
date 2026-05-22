@@ -7,6 +7,7 @@ import { ThinkingBubble } from "@/components/thinking-bubble";
 import { Composer } from "@/components/composer";
 import { useStickToBottom } from "@/hooks/use-stick-to-bottom";
 import { SUGGESTIONS } from "@/lib/mock-data";
+import { cn } from "@/lib/utils";
 
 export function ChatPanel() {
   const { messages, status, errorMessage, sendMessage, clearThread } = useAppState();
@@ -28,10 +29,17 @@ export function ChatPanel() {
           <button
             type="button"
             onClick={clearThread}
-            className="inline-flex items-center gap-1.5 rounded-md px-2 py-1 text-[11px] font-medium text-muted ring-1 ring-line bg-panel-2 transition-colors hover:text-foreground hover:ring-accent/40"
-            title="New conversation"
+            title="Start a fresh conversation"
+            className={cn(
+              "group inline-flex items-center gap-1.5 rounded-full px-3 py-1 text-[11px] font-medium",
+              "text-mobiz ring-1 ring-mobiz/40 bg-mobiz/5",
+              "transition-all duration-150",
+              "hover:bg-mobiz hover:text-white hover:ring-mobiz",
+              "hover:shadow-[0_0_0_3px_rgb(var(--mobiz)/0.15)]",
+              "focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-mobiz/60",
+            )}
           >
-            <RotateCcw className="h-3 w-3" />
+            <RotateCcw className="h-3 w-3 transition-transform group-hover:-rotate-45" />
             New chat
           </button>
         )}

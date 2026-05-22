@@ -1,7 +1,7 @@
 "use client";
 
 import { useCallback, useRef } from "react";
-import { AGENT_URL } from "@/lib/env";
+import { getAgentUrl } from "@/lib/env";
 import type { AgentEventType, AnyAgentEvent, PlannerRequest } from "@/lib/agui-types";
 
 // Set of event names we actually handle. The SSE parser rejects anything
@@ -52,7 +52,7 @@ export function useAgentStream() {
       controllerRef.current = controller;
 
       try {
-        const resp = await fetch(AGENT_URL, {
+        const resp = await fetch(getAgentUrl(), {
           method: "POST",
           headers: {
             "Content-Type": "application/json",
@@ -130,18 +130,14 @@ function parseSseFrame(frame: string): AnyAgentEvent | null {
   // them as RUN_ERROR. Normalize here so the handler only has one case.
   const type = event === "ERROR" ? "RUN_ERROR" : event;
   if (!KNOWN_EVENTS.has(type as AgentEventType)) {
-    if (typeof console !== "undefined") {
-      console.warn(`[agent-stream] ignoring unknown event type: ${type}`);
-    }
+    console.warn(`[agent-stream] ignoring unknown event type: ${type}`);
     return null;
   }
   let parsed: unknown;
   try {
     parsed = JSON.parse(data);
   } catch (err) {
-    if (typeof console !== "undefined") {
-      console.warn(`[agent-stream] malformed JSON for ${type}:`, err);
-    }
+    console.warn(`[agent-stream] malformed JSON for ${type}:`, err);
     return null;
   }
   return { type: type as AgentEventType, data: parsed } as AnyAgentEvent;

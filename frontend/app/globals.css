@@ -26,6 +26,8 @@
   --copilot: 251 191 36;           /* amber */
   --vercel: 251 113 133;           /* rose */
 
+  --mobiz: 214 35 42;              /* brand red, sampled from /mobiz-logo.png */
+
   --ok: 52 211 153;
   --warn: 251 191 36;
   --err: 251 113 133;
@@ -48,6 +50,8 @@
   --agui: 139 79 211;
   --copilot: 196 138 14;
   --vercel: 213 75 95;
+
+  --mobiz: 214 35 42;              /* brand red — same value across themes */
 
   --ok: 16 156 109;
   --warn: 196 138 14;
