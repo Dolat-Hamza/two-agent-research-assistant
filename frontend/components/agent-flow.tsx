@@ -74,8 +74,8 @@ export function AgentFlow() {
   const subline =
     isStreaming || activeAgent !== "idle"
       ? activeAgent === "idle"
-        ? "starting…"
-        : `${activeAgent} · ${step || (activeAgent === "planner" ? "thinking…" : "searching…")}`
+        ? "starting"
+        : `${activeAgent} · ${step || (activeAgent === "planner" ? "thinking" : "searching")}`
       : null;
 
   // Tint the subline dot with the active agent's protocol color so the

@@ -42,7 +42,7 @@ export function ThinkingBubble() {
           <span>{agentLabel}.agent</span>
         </div>
         <div className="flex items-center gap-2 text-[13.5px] text-muted">
-          <span className="lowercase">{step || "thinking…"}</span>
+          <span className="lowercase">{step || "thinking"}</span>
           <span className="inline-flex items-center gap-1" aria-hidden>
             <Dot delay={0} />
             <Dot delay={140} />

@@ -266,7 +266,7 @@ export function AppStateProvider({ children }: { children: React.ReactNode }) {
       setErrorMessage(undefined);
       setStatus("streaming");
       setActiveAgent("idle");
-      setStep("starting…");
+      setStep("starting");
       setToolCalls([]);
       assistantMsgIdRef.current = null;
       pendingToolRef.current = null;
